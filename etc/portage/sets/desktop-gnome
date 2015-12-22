@@ -48,5 +48,5 @@ sys-apps/usb_modeswitch
 www-client/firefox-bin
 www-plugins/adobe-flash
 
-sys-apps/usb_modeswitch
-net-misc/dhcpcd
+# Tools
+x11-terms/sakura
