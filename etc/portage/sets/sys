@@ -1,4 +1,5 @@
 sys-apps/pciutils
+sys-apps/smartmontools
 sys-apps/usbutils
 sys-kernel/dracut
 sys-kernel/gentoo-sources
