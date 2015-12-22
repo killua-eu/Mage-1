@@ -1,0 +1,5 @@
+www-servers/nginx
+dev-lang/php
+dev-db/mariadb
+dev-db/mongodb
+dev-db/redis
