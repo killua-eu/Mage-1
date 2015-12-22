@@ -1,3 +1,11 @@
+app-text/fbreader
+app-text/pdftk
+app-office/libreoffice-bin
+media-gfx/argyllcms
+media-gfx/gimp
+media-gfx/sane-backends
+media-gfx/simple-scan 
+media-gfx/xsane
 net-print/cups
 net-print/cups-filters
 net-print/gutenprint
