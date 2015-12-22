@@ -1,4 +1,15 @@
-app-admin/augeas
+app-arch/p7zip
+app-arch/unace
+app-arch/arj
+app-arch/cpio
+app-arch/dpkg
+app-cdr/cdrtools
+app-arch/zip
+app-arch/lha
+app-arch/lzop
+app-arch/unrar
+app-arch/rpm
+app-arch/zoo
 app-misc/colordiff
 app-misc/mc
 app-misc/unfoo
