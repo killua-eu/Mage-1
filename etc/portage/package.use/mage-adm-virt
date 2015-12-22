@@ -1,0 +1,6 @@
+
+app-emulation/docker aufs
+app-emulation/libvirt sasl virt-network
+app-emulation/qemu iscsi sasl spice ssh tls usbredir vde
+sys-fs/aufs3 fuse inotify kernel-patch
+sys-fs/aufs4 fuse inotify kernel-patch

@@ -1,0 +1,2 @@
+app-eselect/eselect-php fpm
+dev-lang/php crypt curl fpm gd gmp imap mysqli mysqlnd sockets ssl

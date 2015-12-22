@@ -1,4 +1,5 @@
 app-emulation/libvirt
 app-emulation/qemu
-app-emulation/virt-manager
+app-emulation/docker
+app-emulation/lxd
 net-misc/bridge-utils

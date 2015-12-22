@@ -16,6 +16,4 @@ app-misc/unfoo
 app-shells/gentoo-bashcomp
 dev-libs/libisoburn
 app-text/wgetpaste
-net-analyzer/traceroute
-net-misc/keychain
 sys-process/lsof
