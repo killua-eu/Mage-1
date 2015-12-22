@@ -1,0 +1,5 @@
+sys-apps/pciutils
+sys-apps/usbutils
+sys-kernel/dracut
+sys-kernel/gentoo-sources
+sys-kernel/linux-firmware
