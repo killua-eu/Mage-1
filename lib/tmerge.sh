@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+
+. /etc/portage/make.conf      # include make.conf
+
+#
+# Get available memory
+#
+
+if [ "`free -m | grep available | awk '{print $NF}'`" == "available" ]  ; then 
+    MEMFREE=`free -m | grep Mem | awk '{print $NF}'`        # linux kernel >= 3.14
+else
+    MEMFREE=`free -m | awk '{print $4}'| head -3| tail -1`  # linux kernel  < 3.14
+fi
+
+#
+# Leave 200M free, require at least ${MAGE_TMERGE_ALLOC} set in /etc/mage.conf. 
+# If not set then use ${MAGE_TMERGE_ALLOC}=5500
+#
+
+[[ -z "${MAGE_TMERGE_ALLOC}" ]] && MAGE_TMERGE_ALLOC=5500
+ALLOC=$[$MEMFREE-200]
+
+[[ ${ALLOC} -lt ${MAGE_TMERGE_ALLOC} ]] && eexit "Not enough memory (${MEMFREE} MB available), exiting. Set the default MAGE_TMERGE_ALLOC=5500 in /etc/mage.conf to a lower value, or free up some memory"
+einfo "Allocating ${ALLOC} MB for tmpfs ..."
+
+#
+# Mount tmpdir to a non-conflicting path and resolve cases when tmpdir doesn't exist
+#
+
+MOUNTED=false
+[[ -z "${PORTAGE_TMPDIR}" ]] && PORTAGE_TMPDIR=/var/tmp/portage-tmpfs
+if [ ! -d "${PORTAGE_TMPDIR}" ]; then
+    ewarn "PORTAGE_TMPDIR directory doesn't exist, creating ${PORTAGE_TMPDIR} ..."
+    mkdir -p $PORTAGE_TMPDIR
+    eend $?
+fi
+
+
+mounttmpfs() {
+    mount -t tmpfs -o size=${ALLOC}M,nr_inodes=1M tmpfs ${PORTAGE_TMPDIR}
+    sleep 1
+    MOUNTED="true"
+}
+
+compile() {
+    einfo "Running ${BOLD}emerge ${*}${NORMAL} ..."
+    PORTAGE_TMPDIR="${PORTAGE_TMPDIR}" emerge ${*}
+    eend $?
+}
+
+unmount() {
+    einfo "Unmounting tmpfs ..."
+    umount -f ${PORTAGE_TMPDIR}
+    eend $?
+}
+
+einfo "Mounting the tmpfs on ${PORTAGE_TMPDIR}"
+if [ -z "$(pgrep -f /usr/bin/emerge)" ];then
+    if [ -z "$(mount | grep ${PORTAGE_TMPDIR})" ];then
+        mounttmpfs
+    else
+        ewarn "Tmpfs already mounted, continuing ..."
+    fi
+else
+    eexit "Emerge already running!"
+fi
+eend $?
+
+# if available, change the cpu-governor to the highest frequency
+[ -f /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor ] && gov=`cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor` && echo performance > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+
+# run emerge
+compile $@
+emerge @preserved-rebuild
+eend $?
+revdep-rebuild
+eend $?
+
+# unmount tmpfs
+${MOUNTED} && umount ${PORTAGE_TMPDIR}
+
+# set the cpu-governor to original state
+[ -f /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor ] && echo ${gov} > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+
+
