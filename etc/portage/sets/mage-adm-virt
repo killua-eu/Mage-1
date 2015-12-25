@@ -3,3 +3,5 @@ app-emulation/qemu
 app-emulation/docker
 app-emulation/lxd
 net-misc/bridge-utils
+sys-fs/lxcfs
+sys-process/criu
