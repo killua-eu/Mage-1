@@ -1,0 +1,2 @@
+mage profile add dev-php
+layman -a mage-overlay

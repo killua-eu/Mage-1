@@ -3,3 +3,7 @@ dev-lang/php
 dev-db/mariadb
 dev-db/mongodb
 dev-db/redis
+#dev-php/suhosin
+#dev-php/pecl-redis
+#dev-php/pecl-zmq 
+net-libs/zeromq

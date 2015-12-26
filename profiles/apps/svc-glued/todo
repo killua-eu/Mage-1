@@ -1,0 +1,5 @@
+* Write a https://github.com/mkoppanen/php-zmq/tree/php7 ebuild and store it in the mage-overlay
+* Uncomment dev-php/pecl-zmq in sets/mage-svc-glued
+* Write a https://github.com/igbinary/igbinary7 ebuild and store it in the mage-overlay
+* Write a https://github.com/phpredis/phpredis/tree/php7 ebuild and store it in the mage-overlay
+* Uncomment pecl-redis

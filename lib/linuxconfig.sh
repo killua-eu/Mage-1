@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 
 # $1 - file to check against (i.e. /proc/config.gz or /usr/src/linux/.config
-# $2 - file(s) with required options (usually /etc/mage/conflinux)
+# $2 - file(s) with required options (usually profiles/*/*/linuxconfig)
 # $3 - toggle to only show problems
 # TODO speed this script up
 # TODO check for colisions/duplicate entries with dif. values in $1
-# TODO better support $1 as a directory /etc/mage/conflinux/* - now this has to be quoted to work properly
 
 [[ -f ${1} ]] || eexit "Can't find ${1}, exitting."
 [[ -e ${2} ]] || eexit "Can't find ${2}, exitting."

@@ -21,10 +21,10 @@ echo "${1}"
 		    help_banner
 		    help_bootstrap
 		;;
-		conflinux)
-		    . "${DIR}/help/help_conflinux.sh" || eexit "Can't load ${DIR}/help/help_conflinux.sh"
+		linuxconfig)
+		    . "${DIR}/help/help_linuxconfig.sh" || eexit "Can't load ${DIR}/help/help_linuxconfig.sh"
 		    help_banner
-		    help_conflinux
+		    help_linuxconfig
 		;;
 		overlay)
 		    . "${DIR}/help/help_overlay.sh" || eexit "Can't load ${DIR}/help/help_overlay.sh"

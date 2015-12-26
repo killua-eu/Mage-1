@@ -16,7 +16,7 @@ ${BOLD}Usage:
 ${BOLD}All actions:${NORMAL}
      ${GOOD}* help  ${NORMAL}              This help message.
      ${GOOD}* bootstrap${NORMAL}           A semi-interactive Gentoo installer.
-     ${GOOD}* conflinux${NORMAL}           A linux kernel configuration test tool.
+     ${GOOD}* linuxconfig${NORMAL}         A linux kernel configuration test tool.
      ${GOOD}* kernel${NORMAL}              Configure, compile and install the Linux kernel.
      ${GOOD}* test${NORMAL}                Test mage.
      ${GOOD}* tmerge${NORMAL}              Emerge on tmpfs.
