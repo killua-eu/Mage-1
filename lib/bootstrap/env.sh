@@ -53,6 +53,33 @@ env_install() {
   einfo "Syncing portage tree ..."
   emerge-webrsync || ewarn "emerge-webrsync failed (bad connection or server down?)"
   edone "Portage tree synced."
+
+  einfo "Emerging baseline packages"
+  emerge app-portage/cpuinfo2cpuflags app-portage/flaggie app-portage/eix sys-apps/systemd || eexit "Emerge failed"
+  edone "Baseline packages emerged"
+  
+  einfo "Finalizing portage and make.conf configuration ..."
+  mkdir -p /etc/portage/{package.mask,package.unmask,sets,repos.conf,package.accept_keywords,package.use,env,package}
+  cpuinfo2cpuflags-x86 >> /etc/portage/make.conf
+  echo "sys-kernel/dracut" >> /etc/portage/package.accept_keywords/mage-sys-core
+  flaggie +systemd +vaapi +vdpau
+  # If BOOTSTRAP_MAKECONF* parameters from /etc/mage/bootstrap.conf are set, set make.conf accordingly
+  [[ ! -z ${BOOTSTRAP_MAKECONF_LINGUAS} ]] && echo "LINGUAS=${BOOTSTRAP_MAKECONF_LINGUAS}" >> /etc/portage/make.conf
+  [[ ! -z ${BOOTSTRAP_MAKECONF_ACCEPT_LICENSE} ]] && echo "ACCEPT_LICENSE=${BOOTSTRAP_MAKECONF_ACCEPT_LICENSE}" >> /etc/portage/make.conf
+  [[ ! -z ${BOOTSTRAP_MAKECONF_INPUT_DEVICES} ]] && echo "INPUT_DEVICES=${BOOTSTRAP_MAKECONF_INPUT_DEVICES}" >> /etc/portage/make.conf
+  [[ ! -z ${BOOTSTRAP_MAKECONF_VIDEO_CARDS} ]] && echo "VIDEO_CARDS=${BOOTSTRAP_MAKECONF_VIDEO_CARDS}" >> /etc/portage/make.conf
+  edone "Portage and make.conf configuration now set to good defaults"
+  
+  einfo "Enabling the @default mage profile"
+  mage profile enable @default
+  edone "@default mage profile enabled"
+
+  einfo "Setting the locale and timezone ..."
+  echo -e "${BOOTSTRAP_LOCALE_GEN}" >> /etc/locale.gen
+  locale-gen
+  localectl set-locale ${BOOTSTRAP_LOCALE_SET}
+  timedatectl set-timezone ${BOOTSTRAP_TIMEZONE}
+  edone "Timezone and locale set"
   
   einfo "Setting profile ..."
   case "${BOOTSTRAP_PROFILE}" in
@@ -68,48 +95,17 @@ env_install() {
   esac
   echo "" && eselect profile show echo ""
   
-  einfo "Emerging baseline portage utilities"
-  emerge app-portage/cpuinfo2cpuflags app-portage/flaggie app-portage/eix || eexit "Emerge failed"
-  edone "Baseline portage utilities emerged"
-  
-  einfo "Finalizing portage and make.conf configuration ..."
-  mkdir -p /etc/portage/{package.mask,package.unmask,sets,repos.conf,package.accept_keywords,package.use,env,package}
-  cpuinfo2cpuflags-x86 >> /etc/portage/make.conf
-  echo "sys-kernel/dracut" >> /etc/portage/package.accept_keywords/mage-sys-core
-  flaggie +systemd +vaapi +vdpau
-  # If BOOTSTRAP_MAKECONF* parameters from /etc/mage/bootstrap.conf are set, set make.conf accordingly
-  [[ ! -z ${BOOTSTRAP_MAKECONF_LINGUAS} ]] && echo "LINGUAS=${BOOTSTRAP_MAKECONF_LINGUAS}" >> /etc/portage/make.conf
-  [[ ! -z ${BOOTSTRAP_MAKECONF_ACCEPT_LICENSE} ]] && echo "ACCEPT_LICENSE=${BOOTSTRAP_MAKECONF_ACCEPT_LICENSE}" >> /etc/portage/make.conf
-  [[ ! -z ${BOOTSTRAP_MAKECONF_INPUT_DEVICES} ]] && echo "INPUT_DEVICES=${BOOTSTRAP_MAKECONF_INPUT_DEVICES}" >> /etc/portage/make.conf
-  [[ ! -z ${BOOTSTRAP_MAKECONF_VIDEO_CARDS} ]] && echo "VIDEO_CARDS=${BOOTSTRAP_MAKECONF_VIDEO_CARDS}" >> /etc/portage/make.conf
-  edone "Portage and make.conf configuration now set to good defaults"
-  
-  einfo "Getting some Mage sets ..."
-  pushd /etc/portage/sets/
-  wget https://raw.githubusercontent.com/Vaizard/Mage/master/etc/portage/sets/{mage-sys-portage,mage-sys-core,mage-sys-fs,mage-sys-net,mage-adm-tools} || eexit "Downloading Mage sets for portage failed"
-  popd
-  edone "Mage sets installed into /etc/portage/sets"
   
 
 
   
-  ls /usr/share/zoneinfo
-  echo "Europe/Prague" > /etc/timezone
-  emerge --config sys-libs/timezone-data
-  echo "en_US ISO-8859-1
-en_US.UTF-8 UTF-8" >> /etc/locale.gen
-  locale-gen
+
+  
   eselect locale list # select en_US.utf8
   mkdir -p /etc/portage/{package.mask,package.unmask,sets,repos.conf,package.accept_keywords,package.use,env,package}
   # download sets
   emerge @portage
   
-echo "en_US ISO-8859-1
-en_US.UTF-8 UTF-8
-cs_CZ.UTF-8 UTF-8" >> /etc/locale.gen
-locale-gen
-localectl set-locale LANG=en_US.utf8
-timedatectl set-timezone Europe/Prague
 
 
   eix-update
