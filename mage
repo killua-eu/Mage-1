@@ -1,0 +1,168 @@
+#!/usr/bin/env bash
+
+# ##################
+# ### Functions ###
+# ##################
+
+# eexit function (see tmerge for usage)
+
+eend()
+{
+if [ ${1} -ne 0 ]; then
+    echo -e "${MFAIL} Failed ${BOLD}${2}${NORMAL}"
+    exit ${1:-1}
+fi
+}
+
+eexit()
+{
+echo -e "${MFAIL} ${1}"
+exit 1
+}
+
+efail()
+{
+echo -e "${MFAIL} ${1}"
+}
+
+
+ewarn()
+{
+echo -e "${MWARN} ${1}"
+}
+
+einfo()
+{
+echo -e "${MINFO} ${1}"
+}
+
+edone()
+{
+echo -e "${MDONE} ${1}"
+}
+
+
+# magetest() prints several environmental things related to mage
+
+magetest() {
+cat << HELP_END
+
+Testing colors: ${GOOD}GOOD ${WARN}WARN ${BAD}BAD ${HILITE}HILITE ${BRACKET}BRACKET ${BOLD}BOLD ${NORMAL}NORMAL
+
+HELP_END
+exit ${1:-1}
+}
+
+# yesno function
+
+yesno()
+{
+	[ -z "$1" ] && return 1
+
+	case "$1" in
+		[Yy][Ee][Ss]|[Tt][Rr][Uu][Ee]|[Oo][Nn]|1) return 0;;
+		[Nn][Oo]|[Ff][Aa][Ll][Ss][Ee]|[Oo][Ff][Ff]|0) return 1;;
+	esac
+
+	local value=
+	eval value=\$${1}
+	case "$value" in
+		[Yy][Ee][Ss]|[Tt][Rr][Uu][Ee]|[Oo][Nn]|1) return 0;;
+		[Nn][Oo]|[Ff][Aa][Ll][Ss][Ee]|[Oo][Ff][Ff]|0) return 1;;
+		*) ewarn "\$$1 is not set properly"; return 1;;
+	esac
+}
+
+# Setup the colors so our messages all look pretty
+
+if yesno "${RC_NOCOLOR}"; then
+	unset GOOD WARN BAD NORMAL HILITE BRACKET
+elif (command -v tput && tput colors) >/dev/null 2>&1; then
+	GOOD="$(tput sgr0)$(tput bold)$(tput setaf 2)"
+	WARN="$(tput sgr0)$(tput bold)$(tput setaf 3)"
+	BAD="$(tput sgr0)$(tput bold)$(tput setaf 1)"
+	HILITE="$(tput sgr0)$(tput bold)$(tput setaf 6)"
+	BRACKET="$(tput sgr0)$(tput bold)$(tput setaf 4)"
+	NORMAL="$(tput sgr0)"
+	BOLD="$(tput sgr0)$(tput bold)"
+	MINFO="${BRACKET}[*]${NORMAL}"
+	MWARN="${WARN}[?]${NORMAL}"
+	MFAIL="${BAD}[!]${NORMAL}"
+	MDONE="${GOOD}[y]${NORMAL}"
+else
+	GOOD=$(printf '\033[32;01m')
+	WARN=$(printf '\033[33;01m')
+	BAD=$(printf '\033[31;01m')
+	HILITE=$(printf '\033[36;01m')
+	BRACKET=$(printf '\033[34;01m')
+	NORMAL=$(printf '\033[0m')
+	HEAD=  $(printf '\033[01m') 
+	MINFO="${BRACKET}[*]${NORMAL}"
+	MWARN="${WARN}[?]${NORMAL}"
+	MFAIL="${BAD}[!]${NORMAL}"
+	MDONE="${GOOD}[y]${NORMAL}"
+fi
+
+ismounted() {
+  mountpoint -q "${1}" && mount | grep "on ${1} " > /dev/null && return 0
+  return 1
+  }
+
+# ##################
+# ### Load stuff ###
+# ##################
+
+DIR="${BASH_SOURCE%/*}"
+if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
+
+[ -f "/etc/mage/mage.conf" ] 	&& source "/etc/mage/mage.conf"
+[ -f "$DIR/mage.conf" ] 	&& source "$DIR/mage.conf"
+
+      
+
+
+
+# ##################
+# ### Run ###
+# ##################
+DIR="/home/vrs/Dev/Mage/lib"
+[[ -z ${SCRIPT} ]] && SCRIPT=`readlink -f $0`
+[[ -z ${BINDIR} ]] && BINDIR=`dirname "${SCRIPT}"`
+[[ -z ${LIBDIR} ]] && LIBDIR="${BINDIR}/lib"
+[[ -z ${VARDIR} ]] && VARDIR="${BINDIR}/profiles"
+[[ -z ${ETCDIR} ]] && ETCDIR="${BINDIR}/etc"
+
+    kernel)
+	shift 1 ; . "${DIR}/kernel.sh" || eexit "Can't load ${DIR}/kernel.sh"
+    ;;
+
+    test)
+	magetest;
+    ;;
+    tmerge)
+	shift 1 ; . "${DIR}/tmerge.sh" || eexit "Can't load ${DIR}/tmerge.sh"
+    ;;
+    linuxconfig)
+	shift 1 ; . "${DIR}/linuxconfig.sh" || eexit "Can't load ${DIR}/linuxconfig.sh"
+    ;;
+    overlay)
+	shift 1 ; . "${DIR}/overlay.sh" || eexit "Can't load ${DIR}/overlay.sh"
+    ;;
+    bootstrap)
+        shift 1 ; . "${DIR}/bootstrap.sh" || eexit "Can't load ${DIR}/bootstrap.sh"
+    ;;
+    profile)
+        shift 1 ; . "${DIR}/profile.sh" || eexit "Can't load ${DIR}/profile.sh"
+    ;;
+  
+
+  
+    help|-h|--help)
+    	shift 1 ; . "${DIR}/help.sh" || eexit "Can't load ${DIR}/help"
+    ;;
+
+    *)
+	echo -e "Sorry, action ${BAD}$1${NORMAL} not recognized."
+	echo -e "Try ${BOLD}mage help${NORMAL} for a list of valid actions." 
+	exit 1
+    esac
