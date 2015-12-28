@@ -48,15 +48,16 @@ env_chroot_reenter() {
   mage bootstrap env chroot
 }
 
-# Install Gentoo with all the packages, configure kernel, write /etc/fstab, reboot & enjoy
+# Configure the environment and install userspace
 env_install() {
   einfo "Syncing portage tree ..."
   emerge-webrsync || ewarn "emerge-webrsync failed (bad connection or server down?)"
   edone "Portage tree synced."
 
-  einfo "Emerging baseline packages"
+  einfo "Emerging baseline packages, resyncing the live tree"
   emerge app-portage/cpuinfo2cpuflags app-portage/flaggie app-portage/eix sys-apps/systemd || eexit "Emerge failed"
-  edone "Baseline packages emerged"
+  eix-sync || eexit "Failed syncing the portage tree. Connection down?"
+  edone "Baseline packages emerged, live tree resynced."
   
   einfo "Finalizing portage and make.conf configuration ..."
   mkdir -p /etc/portage/{package.mask,package.unmask,sets,repos.conf,package.accept_keywords,package.use,env,package}
@@ -69,63 +70,89 @@ env_install() {
   [[ ! -z ${BOOTSTRAP_MAKECONF_INPUT_DEVICES} ]] && echo "INPUT_DEVICES=${BOOTSTRAP_MAKECONF_INPUT_DEVICES}" >> /etc/portage/make.conf
   [[ ! -z ${BOOTSTRAP_MAKECONF_VIDEO_CARDS} ]] && echo "VIDEO_CARDS=${BOOTSTRAP_MAKECONF_VIDEO_CARDS}" >> /etc/portage/make.conf
   edone "Portage and make.conf configuration now set to good defaults"
-  
-  einfo "Enabling the @default mage profile"
-  mage profile enable @default
-  edone "@default mage profile enabled"
 
-  einfo "Setting the locale and timezone ..."
-  echo -e "${BOOTSTRAP_LOCALE_GEN}" >> /etc/locale.gen
-  locale-gen
-  localectl set-locale ${BOOTSTRAP_LOCALE_SET}
-  timedatectl set-timezone ${BOOTSTRAP_TIMEZONE}
-  edone "Timezone and locale set"
-  
-  einfo "Setting profile ..."
-  case "${BOOTSTRAP_PROFILE}" in
-    desktop-gnome) 
-        eselect profile set "default/linux/amd64/13.0/desktop/gnome/systemd"
-    ;;
-    server)
-        eselect profile set "default/linux/amd64/13.0/systemd"
-    ;;
-    *)
-        eexit "BOOTSTRAP_PROFILE in /etc/mage/bootstrap.conf is misconfigured."
-    ;;
-  esac
-  echo "" && eselect profile show echo ""
-  
-  
-
-
-  
-
-  
-  eselect locale list # select en_US.utf8
-  mkdir -p /etc/portage/{package.mask,package.unmask,sets,repos.conf,package.accept_keywords,package.use,env,package}
-  # download sets
-  emerge @portage
-  
-
-
-  eix-update
-  eix-sync
-  emerge -uDN @kernel @boot @core @tools
-  cd /usr/src/linux
-  make nconfig
-  make && make modules_install
-  make install # copy stuff to /boot
-  
+  einfo "Setting up Mage"
+  # Portage repo symlinks
   mkdir -p /var/mage/repos
   ln -s /usr/portage /var/mage/repos/gentoo
   ln -s /usr/local/portage /var/mage/repos/local
   ln -s /var/lib/layman /var/mage/repos/layman
   ln -s /usr/lib/portage /var/mage/repos/layman
-  {gentoo,distfiles,local,layman}
+  # Mount point for `mage tmerge`
   mkdir -p /tmp/portage
-  mv /usr/portage/* /var/portage/gentoo/
-  mkdir -p /boot/efi/boot
-  cp /boot/vmlinuz-* /boot/efi/boot/bootx64.efi
+  edone "Mage is set up"
+ 
+  einfo "Setting the locale, timezone and systemd requirements..."
+  echo -e "${BOOTSTRAP_LOCALE_GEN}" >> /etc/locale.gen
+  locale-gen
+  localectl set-locale ${BOOTSTRAP_LOCALE_SET}
+  timedatectl set-timezone ${BOOTSTRAP_TIMEZONE}
+  # required by systemd
+  ln -sf /proc/self/mounts /etc/mtab
+  edone "Timezone, locale and systemd requirements set"
+  
+  einfo "Enabling bootstrap profiles"
+  for PROFILE in ${BOOTSTRAP_PROFILES} ; do
+    [[ ${PROFILE} == *"system/"* ]] && `echo "${SCRIPT} profile enable ${PROFILE}"` || eexit "Enabling profile ${PROFILE} failed"
+    # TODO counter to see how many system profiles have been enabled
+  done
+  for PROFILE in ${BOOTSTRAP_PROFILES} ; do
+    [[ ${PROFILE} == *"hardware/"* ]] && `echo "${SCRIPT} profile enable ${PROFILE}"` || eexit "Enabling profile ${PROFILE} failed"
+    # TODO counter to see how many hardware profiles have been enabled
+  done
+  for PROFILE in ${BOOTSTRAP_PROFILES} ; do
+    [[ ${PROFILE} == *"app/"* ]] && `echo "${SCRIPT} profile enable ${PROFILE}"` || eexit "Enabling profile ${PROFILE} failed"
+  done
+  edone "All profiles enabled"
+}
+
+# configure kernel, write /etc/fstab, reboot & enjoy
+env_kernel() {
+
+  pushd /usr/src/linux
+  ${SCRIPT} linuxconfig /etc/mage/conflinux/* /usr/src/linux/.config problems
+  make nconfig
+  ${SCRIPT} linuxconfig /etc/mage/conflinux/* /usr/src/linux/.config problems
+    
+  read -r -p "Happy now with your config? [y/n]: " response
+  case $response in
+      [yY]) 
+          make && make modules_install
+          # TODO test na boot jako mountpoint
+          make install # copy stuff to /boot
+          mkdir -p /boot/efi/boot
+          cp /boot/vmlinuz-* /boot/efi/boot/bootx64.efi
+      ;;
+      *)
+          eexit "Dang! In that case, re-run mage bootstrap env-kernel"
+      ;;
+  esac
+  
+  
+  
+
+
+env_user() {
+ eexit "mage bootstrap user isn't written yet!"
+ #TODO test useradd with nonexisting groupp
+ #useradd -m -G users,wheel,video,plugdev,portage,games,usb,lp,lpadmin,scanner -s /bin/bash <user> # not audio due to pulseaudio
+ #passwd <user>
+}
+
+
+env_bootloader() {
+ eexit "mage bootstrap bootloader isn't written yet!"
+}
+  
+# configure kernel, write /etc/fstab, reboot & enjoy
+env_bootloader_unfinished() {
+
+# gnome na extu
+echo 'GRUB_CMDLINE_LINUX="rootfstype=ext4 real_init=/usr/lib/systemd/systemd"' >> /etc/default/grub
+grub2-install /dev/sda
+grub2-mkconfig -o /boot/grub/grub.cfg
+
+# btrfs na 2 discich s dracutem
   dracut --hostonly 
   grub2-install /dev/sda
   grub2-install /dev/sdb
@@ -141,5 +168,11 @@ LABEL="boot"        /boot           ext2        noauto,noatime                  
 LABEL="root"        /               brtfs       defaults,noatime,compress=lzo,autodefrag,subvol=root    0 0
 LABEL="root"        /home           brtfs       defaults,noatime,compress=lzo,autodefrag,subvol=home    0 0
 LABEL="swap"        none            swap        sw                                                      0 0
+" >> /etc/fstab
+
+  echo "
+/dev/sda3   none         swap    sw                                      0 0
+/dev/sda2   /            ext4    defaults,noatime,nodiratime,discard     0 1
+/dev/sda4   /boot	 ext4    defaults,noatime,nodiratime,discard	 0 2
 " >> /etc/fstab
 }

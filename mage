@@ -126,43 +126,45 @@ if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
 # ### Run ###
 # ##################
 DIR="/home/vrs/Dev/Mage/lib"
+
 [[ -z ${SCRIPT} ]] && SCRIPT=`readlink -f $0`
 [[ -z ${BINDIR} ]] && BINDIR=`dirname "${SCRIPT}"`
 [[ -z ${LIBDIR} ]] && LIBDIR="${BINDIR}/lib"
 [[ -z ${VARDIR} ]] && VARDIR="${BINDIR}/profiles"
 [[ -z ${ETCDIR} ]] && ETCDIR="${BINDIR}/etc"
 
-    kernel)
-	shift 1 ; . "${DIR}/kernel.sh" || eexit "Can't load ${DIR}/kernel.sh"
-    ;;
 
+case "$1" in
+    kernel)
+	shift 1 ; . "${LIBDIR}/kernel.sh" || eexit "Can't load ${LIBDIR}/kernel.sh"
+    ;;
     test)
 	magetest;
     ;;
     tmerge)
-	shift 1 ; . "${DIR}/tmerge.sh" || eexit "Can't load ${DIR}/tmerge.sh"
+	shift 1 ; . "${LIBDIR}/tmerge.sh" || eexit "Can't load ${LIBDIR}/tmerge.sh"
     ;;
     linuxconfig)
-	shift 1 ; . "${DIR}/linuxconfig.sh" || eexit "Can't load ${DIR}/linuxconfig.sh"
+	shift 1 ; . "${LIBDIR}/linuxconfig.sh" || eexit "Can't load ${LIBDIR}/linuxconfig.sh"
     ;;
     overlay)
-	shift 1 ; . "${DIR}/overlay.sh" || eexit "Can't load ${DIR}/overlay.sh"
+	shift 1 ; . "${LIBDIR}/overlay.sh" || eexit "Can't load ${LIBDIR}/overlay.sh"
     ;;
     bootstrap)
-        shift 1 ; . "${DIR}/bootstrap.sh" || eexit "Can't load ${DIR}/bootstrap.sh"
+        shift 1 ; . "${LIBDIR}/bootstrap.sh" || eexit "Can't load ${LIBDIR}/bootstrap.sh"
     ;;
     profile)
-        shift 1 ; . "${DIR}/profile.sh" || eexit "Can't load ${DIR}/profile.sh"
+        shift 1 ; . "${LIBDIR}/profile.sh" || eexit "Can't load ${LIBDIR}/profile.sh"
     ;;
   
 
   
     help|-h|--help)
-    	shift 1 ; . "${DIR}/help.sh" || eexit "Can't load ${DIR}/help"
+    	shift 1 ; . "${LIBDIR}/help.sh" || eexit "Can't load ${LIBDIR}/help"
     ;;
 
     *)
 	echo -e "Sorry, action ${BAD}$1${NORMAL} not recognized."
 	echo -e "Try ${BOLD}mage help${NORMAL} for a list of valid actions." 
 	exit 1
-    esac
+esac

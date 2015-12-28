@@ -24,5 +24,13 @@ Mage will expect following paths:
 - /var/mage/profiles.all for all available profiles
 - /var/mage/profiles.active for active profiles
 
+**WARNING**
+
+Mage is currently designed (by a line of code here andthere) to rely on systemd. The reasons are following:
+
+- We prefer a Gnome desktop
+- We're interested in exploring systemd+virtualization integration possibilities (i.e. CoreOS, etc.)
+- We want to help change Gentoo+Systemd to an alternative as good as Gentoo+OpenRC
+
 Use with caution, while we'll try to help, consider the scripts easy enough to come without any support.
 

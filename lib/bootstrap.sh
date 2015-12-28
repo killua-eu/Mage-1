@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-. /etc/portage/make.conf      # include make.conf
-
+. /etc/portage/make.conf            # include make.conf
+. "${ETCDIR}/mage/bootstrap.conf"   # include make.conf
 
     case "$1" in
 
         net)
             shift 1;
-	    . "${DIR}/bootstrap/net.sh" || eexit "Can't load ${DIR}/bootstrap/net.sh"
+	    . "${LIBDIR}/bootstrap/net.sh" || eexit "Can't load ${LIBDIR}/bootstrap/net.sh"
 	    case "$1" in
 	         test)
 	              net_test
@@ -19,7 +19,7 @@
 	;;
 	disks)
 	    shift 1
-	    . "${DIR}/bootstrap/disks.sh" || eexit "Can't load ${DIR}/bootstrap/disks.sh"
+	    . "${LIBDIR}/bootstrap/disks.sh" || eexit "Can't load ${LIBDIR}/bootstrap/disks.sh"
 	    case "$1" in
 	         setup)
 	              disks_setup
@@ -31,7 +31,7 @@
 	;;
 	env)
 	    shift 1
-	    . "${DIR}/bootstrap/env.sh" || eexit "Can't load ${DIR}/bootstrap/env.sh"
+	    . "${LIBDIR}/bootstrap/env.sh" || eexit "Can't load ${LIBDIR}/bootstrap/env.sh"
 	    case "$1" in
 	         chroot)
 	              env_chroot
@@ -39,9 +39,23 @@
 	         chroot-reenter)
 	              env_chroot_reenter
 	         ;;
+	         env-prepare)
+	              env_prepare
+	         ;;
+	         env-install)
+	              env_install
+	         ;;
+	         env-kernel)
+	              env_kernel
+	         ;;
+	         env-user)
+	              env_user
+	         ;;
+	         env-bootloader)
+	              env_bootloader
+	         ;;
 	    esac
-	    
-	
+	    	
 	;;
         *)
     	    eexit "Command ${BOLD}${1}${NORMAL} not recognized, exitting. Try ${BOLD}mage help bootstrap${NORMAL}"
