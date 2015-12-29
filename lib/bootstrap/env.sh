@@ -51,15 +51,18 @@ env_install() {
   edone "Portage tree synced."
 
   einfo "Updating portage's make.conf defaults"
-  echo "MAKEOPTS=\"-j"$((`nproc` + 1))\" >> /mnt/gentoo/etc/portage/make.conf
-  echo "PORTAGE_ELOG_CLASSES=\"info log warn error\"" >> /mnt/gentoo/etc/portage/make.conf
-  echo "PORTAGE_ELOG_SYSTEM=\"save\"" >> /mnt/gentoo/etc/portage/make.conf
-  echo "FEATURES=\"cgroup parallel-install\"" >> /mnt/gentoo/etc/portage/make.conf
+  echo "MAKEOPTS=\"-j$((`nproc` + 1))\"" >> /etc/portage/make.conf
+  echo "PORTAGE_ELOG_CLASSES=\"info log warn error\"" >> /etc/portage/make.conf
+  echo "PORTAGE_ELOG_SYSTEM=\"save\"" >> /etc/portage/make.conf
+  echo "FEATURES=\"cgroup parallel-install\"" >> /etc/portage/make.conf
+  echo "EMERGE_DEFAULT_OPTS=\"--jobs=2\"" >> /etc/portage/make.conf
   edone "make.conf defaults set" && echo  ""  
 
+  # Needs be done here, otherwise python utils such as flaggie will fail to run because of UTF
   einfo "Setting the locale"
   echo -e "${BOOTSTRAP_LOCALE_GEN}" >> /etc/locale.gen
   locale-gen
+  eselect locale set "en_US.utf8" # this will fail if the locale isnt in /etc/locale.gen, test it!
   env-update && source /etc/profile
   edone "Locale set"  
   
@@ -81,7 +84,7 @@ env_install() {
   edone "Portage and make.conf configuration now set to good defaults"
 
   einfo "Emerging systemd"
-  emerge sys-apps/systemd || eexit "Emerge failed"
+  emerge -uDN sys-apps/systemd || eexit "Emerge failed"
   edone "systemd emerged"  
   
   einfo "Setting up Mage"
@@ -90,14 +93,15 @@ env_install() {
   ln -s /usr/portage /var/mage/repos/gentoo
   ln -s /usr/local/portage /var/mage/repos/local
   ln -s /var/lib/layman /var/mage/repos/layman
-  ln -s /usr/lib/portage /var/mage/repos/layman
   # Mount point for `mage tmerge`
   mkdir -p /tmp/portage
   edone "Mage is set up"
  
+  
   einfo "Configuring for systemd ..."
-  localectl set-locale ${BOOTSTRAP_LOCALE_SET}
-  timedatectl set-timezone ${BOOTSTRAP_TIMEZONE}
+  # TODO toto az po rebootu!!!
+  #localectl set-locale ${BOOTSTRAP_LOCALE_SET}
+  #timedatectl set-timezone ${BOOTSTRAP_TIMEZONE}
   # required by systemd
   ln -sf /proc/self/mounts /etc/mtab
   edone "Systemd configuration done"
