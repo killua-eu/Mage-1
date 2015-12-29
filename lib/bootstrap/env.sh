@@ -14,8 +14,8 @@ env_prepare() {
   ls "./stage3-amd64-$STAGE3.tar.bz2" || eexit "Failed to fetch ${SRC}"
   edone "stage3-amd64-$STAGE3.tar.bz2 downloaded" && echo  ""
   
-  einfo "Extracting stage3-amd64-$STAGE3.tar.bz2"
-  tar xvjpf "stage3-amd64-${STAGE3}.tar.bz2" --xattrs || eexit "Failed to extract the stage3-amd64-${STAGE3}.tar.bz2 archive"
+  einfo "Extracting stage3-amd64-$STAGE3.tar.bz2 ..."
+  tar xjpf "stage3-amd64-${STAGE3}.tar.bz2" --xattrs || eexit "Failed to extract the stage3-amd64-${STAGE3}.tar.bz2 archive"
   edone "stage3-amd64-$STAGE3.tar.bz2 extracted" && echo  ""
 }
 
@@ -56,6 +56,12 @@ env_install() {
   echo "PORTAGE_ELOG_SYSTEM=\"save\"" >> /mnt/gentoo/etc/portage/make.conf
   echo "FEATURES=\"cgroup parallel-install\"" >> /mnt/gentoo/etc/portage/make.conf
   edone "make.conf defaults set" && echo  ""  
+
+  einfo "Setting the locale"
+  echo -e "${BOOTSTRAP_LOCALE_GEN}" >> /etc/locale.gen
+  locale-gen
+  env-update && source /etc/profile
+  edone "Locale set"  
   
   einfo "Emerging baseline packages, resyncing the live tree"
   emerge app-portage/cpuinfo2cpuflags app-portage/flaggie app-portage/eix || eexit "Emerge failed"
@@ -68,15 +74,15 @@ env_install() {
   echo "sys-kernel/dracut" >> /etc/portage/package.accept_keywords/mage-sys-core
   flaggie +systemd +vaapi +vdpau
   # If BOOTSTRAP_MAKECONF* parameters from /etc/mage/bootstrap.conf are set, set make.conf accordingly
-  [[ ! -z ${BOOTSTRAP_MAKECONF_LINGUAS} ]] && echo "LINGUAS=${BOOTSTRAP_MAKECONF_LINGUAS}" >> /etc/portage/make.conf
-  [[ ! -z ${BOOTSTRAP_MAKECONF_ACCEPT_LICENSE} ]] && echo "ACCEPT_LICENSE=${BOOTSTRAP_MAKECONF_ACCEPT_LICENSE}" >> /etc/portage/make.conf
-  [[ ! -z ${BOOTSTRAP_MAKECONF_INPUT_DEVICES} ]] && echo "INPUT_DEVICES=${BOOTSTRAP_MAKECONF_INPUT_DEVICES}" >> /etc/portage/make.conf
-  [[ ! -z ${BOOTSTRAP_MAKECONF_VIDEO_CARDS} ]] && echo "VIDEO_CARDS=${BOOTSTRAP_MAKECONF_VIDEO_CARDS}" >> /etc/portage/make.conf
+  [[ ! -z ${BOOTSTRAP_MAKECONF_LINGUAS} ]] && echo "LINGUAS="${BOOTSTRAP_MAKECONF_LINGUAS}"" >> /etc/portage/make.conf
+  [[ ! -z ${BOOTSTRAP_MAKECONF_ACCEPT_LICENSE} ]] && echo "ACCEPT_LICENSE="${BOOTSTRAP_MAKECONF_ACCEPT_LICENSE}"" >> /etc/portage/make.conf
+  [[ ! -z ${BOOTSTRAP_MAKECONF_INPUT_DEVICES} ]] && echo "INPUT_DEVICES="${BOOTSTRAP_MAKECONF_INPUT_DEVICES}"" >> /etc/portage/make.conf
+  [[ ! -z ${BOOTSTRAP_MAKECONF_VIDEO_CARDS} ]] && echo "VIDEO_CARDS="${BOOTSTRAP_MAKECONF_VIDEO_CARDS}"" >> /etc/portage/make.conf
   edone "Portage and make.conf configuration now set to good defaults"
 
   einfo "Emerging systemd"
   emerge sys-apps/systemd || eexit "Emerge failed"
-  edone "Baseline systemd"  
+  edone "systemd emerged"  
   
   einfo "Setting up Mage"
   # Portage repo symlinks
@@ -89,14 +95,12 @@ env_install() {
   mkdir -p /tmp/portage
   edone "Mage is set up"
  
-  einfo "Setting the locale, timezone and systemd requirements..."
-  echo -e "${BOOTSTRAP_LOCALE_GEN}" >> /etc/locale.gen
-  locale-gen
+  einfo "Configuring for systemd ..."
   localectl set-locale ${BOOTSTRAP_LOCALE_SET}
   timedatectl set-timezone ${BOOTSTRAP_TIMEZONE}
   # required by systemd
   ln -sf /proc/self/mounts /etc/mtab
-  edone "Timezone, locale and systemd requirements set"
+  edone "Systemd configuration done"
   
   einfo "Enabling bootstrap profiles"
   for PROFILE in ${BOOTSTRAP_PROFILES} ; do
