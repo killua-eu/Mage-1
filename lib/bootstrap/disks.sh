@@ -16,6 +16,7 @@ disks_setup() {
     einfo "    1) Server setup (2 disks): 2x biosboot + mdraid1.ext4 /boot + mdraid1.ext4 swap + btrfs.raid1 root"
     einfo "    2) General setup (1 disk): 1x biosboot + ext4 /boot + swap + btrfs root"
     einfo "    3) General setup (1 disk): 1x biosboot + ext4 /boot + swap + ext4 root + aufs patch"
+    echo ""
     ewarn "Pick your choice: " && read choice
 
     case "$choice" in
@@ -101,44 +102,33 @@ btrfs_subvols_def() {
 
     # Create default btrfs subvolumes set
     
-    # /
-    einfo "Creating ${BOLD}root${NORMAL} subvolume"
+    # Mount btrfs
+    einfo "Creating subvolumes"
     mkdir -p /mnt/{btrfs,gentoo}
     mount -t btrfs -o defaults,noatime,compress=lzo,autodefrag "${1}" /mnt/btrfs || eexit "Failed mounting /mnt/btrfs"
-    btrfs subvolume create /mnt/btrfs/root || eexit "Failed creating root subvolume"
+    pushd /mnt/btrfs >> /dev/null
+    
+    # Create subvolumes @,@/root,@/home, ...
+    btrfs subvolume create @    || eexit "Failed creating @ subvolume"
+    btrfs subvolume create root || eexit "Failed creating root subvolume"
+    btrfs subvolume create home || eexit "Failed creating home subvolume"
+    btrfs subvolume create tmp  || eexit "Failed creating tmp subvolume"
+    mkdir -p var/lib
+    btrfs subvolume create var/log || eexit "Failed creating var/log subvolume"
+    btrfs subvolume create var/spool || eexit "Failed creating var/spool subvolume"
+
+    # Unmount again and remount with options
+    popd
     umount /mnt/btrfs
-    mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=root "${1}" /mnt/gentoo || eexit "Failed mounting /mnt/gentoo"
+    mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@ "${1}" /mnt/gentoo || eexit "Failed mounting /mnt/gentoo"
     sleep 1
-    
-    # /home
-    einfo "Creating ${BOLD}/home${NORMAL} subvolume"
-    btrfs subvol create /mnt/gentoo/home || eexit "Failed creating home subvolume"
+    mkdir -p /mnt/gentoo/{home,root,var,tmp}
+    mkdir -p /mnt/gentoo/var/{spool,log}    
     mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=home "${1}" /mnt/gentoo/home || eexit "Failed mounting /mnt/gentoo/home"
-
-    # /tmp
-    einfo "Creating ${BOLD}/tmp${NORMAL} subvolume"
-    btrfs subvol create /mnt/gentoo/tmp || eexit "Failed creating tmp subvolume"
+    mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=root "${1}" /mnt/gentoo/home || eexit "Failed mounting /mnt/gentoo/root" 
     mount -t btrfs -o defaults,space_cache,nodatacow,noatime,compress=lzo,autodefrag,subvol=tmp "${1}" /mnt/gentoo/tmp || eexit "Failed mounting /mnt/gentoo/tmp"
-
-    # Create /var directory so that we can make /var/* subovlumes
-    mkdir -p /mnt/gentoo/var
-    # Create /var/lib directory so that we can make /var/lib* subovlumes
-    mkdir -p /mnt/gentoo/var/lib
-    
-    # /var/log
-    einfo "Creating ${BOLD}/var/log${NORMAL} subvolume"
-    btrfs subvol create /mnt/gentoo/var/log || eexit "Failed creating varlog subvolume"
-    mount -t btrfs -o defaults,space_cache,nodatacow,noatime,compress=lzo,autodefrag,subvol=varlog "${1}" /mnt/gentoo/var/log || eexit "Failed mounting /mnt/gentoo/var/log"
-
-    # /var/tmp
-    einfo "Creating ${BOLD}/var/tmp${NORMAL} subvolume"
-    btrfs subvol create /mnt/gentoo/var/tmp || eexit "Failed creating vartmp subvolume"
-    mount -t btrfs -o defaults,space_cache,nodatacow,noatime,compress=lzo,autodefrag,subvol=vartmp "${1}" /mnt/gentoo/var/tmp || eexit "Failed mounting /mnt/gentoo/var/tmp"
-
-    # /var/spool
-    einfo "Creating ${BOLD}/var/spool${NORMAL} subvolume"
-    btrfs subvol create /mnt/gentoo/var/spool || eexit "Failed creating varspool subvolume"
-    mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=varspool "${1}" /mnt/gentoo/var/spool || eexit "Failed mounting /mnt/gentoo/var/spool"
+    mount -t btrfs -o defaults,space_cache,nodatacow,noatime,compress=lzo,autodefrag,subvol=var/log "${1}" /mnt/gentoo/var/log || eexit "Failed mounting /mnt/gentoo/var/log"
+    mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=var/spool "${1}" /mnt/gentoo/var/spool || eexit "Failed mounting /mnt/gentoo/var/spool"
 
     # Copy-on-write comes with some advantages, but can negatively affect performance with large files that have 
     # small random writes because it will fragment them (even if no "copy" is ever performed!). It is recommended
@@ -248,7 +238,7 @@ disks_remount() {
     einfo " 1) Server setup (2 disks): 2x biosboot + mdraid1.ext4 /boot + mdraid1.ext4 swap + btrfs.raid1 root"
     einfo " 2) General setup (1 disk): 1x biosboot + ext4 /boot + swap + btrfs root"
     einfo " 3) General setup (1 disk): 1x biosboot + ext4 /boot + swap + ext4 root + aufs patch"
-    echo ""
+    echo -e ""
     ewarn "Pick your choice: " && read choice
 
     case "$choice" in
