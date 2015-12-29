@@ -31,6 +31,7 @@ env_chroot() {
   einfo "Chrooting into /mnt/gentoo"
   ismounted /mnt/gentoo || eexit "/mnt/gentoo unmounted or not a mount point. If you rebooted, you may need to remount partitions (and/or volumes and subvolumes), \`mage env chroot-reenter\` should do that for you. If this is a first installation, either something went really wrong, or you did some steps out of expected order. Either way, you're screwed. You may want to try to ask on github or in gentoo forums tho (beware that mage is not an official thing, so support might be scarse)."
   #cp -r ~/Mage-master /mnt/gentoo
+  [[ -d "/mnt/gentoo/etc/" ]] || eexit "env prepare stage was probably not called or failed"
   cp -L /etc/resolv.conf /mnt/gentoo/etc/
   mount -t proc proc /mnt/gentoo/proc
   mount --rbind /sys /mnt/gentoo/sys
@@ -39,7 +40,7 @@ env_chroot() {
   rm /dev/shm && mkdir /dev/shm
   mount -t tmpfs -o nosuid,nodev,noexec shm /dev/shm
   chmod 1777 /dev/smh
-  chroot /mnt/gentoo /bin/bash -c "printf '\033[33;01m[*] YOU ARE NOW IN THE /MNT/GENTOO CHROOT.\033[0m\n\033[01m[!] Please run:\n    source /etc/profile\n    env-update\n    export PS1=\"(chroot) \$PS1\"\n    mage env install' && echo \"    ${1}\"" 
+  chroot /mnt/gentoo /bin/bash -c "printf '\033[33;01m[*] YOU ARE NOW IN THE /MNT/GENTOO CHROOT.\033[0m\n\033[01m[!] Please run:\n    source /etc/profile\n    env-update\n    export PS1=\"(chroot) \$PS1\"\n    mage bootstrap env install' && echo \"    ${1}\"" 
   chroot /mnt/gentoo /bin/bash
 }
 
