@@ -17,13 +17,6 @@ env_prepare() {
   einfo "Extracting stage3-amd64-$STAGE3.tar.bz2"
   tar xvjpf "stage3-amd64-${STAGE3}.tar.bz2" --xattrs || eexit "Failed to extract the stage3-amd64-${STAGE3}.tar.bz2 archive"
   edone "stage3-amd64-$STAGE3.tar.bz2 extracted" && echo  ""
-
-  einfo "Updating portage's make.conf defaults"
-  echo "MAKEOPTS=\"-j"$((`nproc` + 1))\" >> /mnt/gentoo/etc/portage/make.conf
-  echo "PORTAGE_ELOG_CLASSES=\"info log warn error\"" >> /mnt/gentoo/etc/portage/make.conf
-  echo "PORTAGE_ELOG_SYSTEM=\"save\"" >> /mnt/gentoo/etc/portage/make.conf
-  echo "FEATURES=\"cgroup parallel-install\"" >> /mnt/gentoo/etc/portage/make.conf
-  edone "make.conf defaults set" && echo  ""
 }
 
 # Enter the /mnt/gentoo chroot (this should work after having booted from any linux livecd)
@@ -57,6 +50,13 @@ env_install() {
   emerge-webrsync || ewarn "emerge-webrsync failed (bad connection or server down?)"
   edone "Portage tree synced."
 
+  einfo "Updating portage's make.conf defaults"
+  echo "MAKEOPTS=\"-j"$((`nproc` + 1))\" >> /mnt/gentoo/etc/portage/make.conf
+  echo "PORTAGE_ELOG_CLASSES=\"info log warn error\"" >> /mnt/gentoo/etc/portage/make.conf
+  echo "PORTAGE_ELOG_SYSTEM=\"save\"" >> /mnt/gentoo/etc/portage/make.conf
+  echo "FEATURES=\"cgroup parallel-install\"" >> /mnt/gentoo/etc/portage/make.conf
+  edone "make.conf defaults set" && echo  ""  
+  
   einfo "Emerging baseline packages, resyncing the live tree"
   emerge app-portage/cpuinfo2cpuflags app-portage/flaggie app-portage/eix sys-apps/systemd || eexit "Emerge failed"
   eix-sync || eexit "Failed syncing the portage tree. Connection down?"
@@ -74,6 +74,10 @@ env_install() {
   [[ ! -z ${BOOTSTRAP_MAKECONF_VIDEO_CARDS} ]] && echo "VIDEO_CARDS=${BOOTSTRAP_MAKECONF_VIDEO_CARDS}" >> /etc/portage/make.conf
   edone "Portage and make.conf configuration now set to good defaults"
 
+  einfo "Emerging systemd"
+  emerge sys-apps/systemd || eexit "Emerge failed"
+  edone "Baseline systemd"  
+  
   einfo "Setting up Mage"
   # Portage repo symlinks
   mkdir -p /var/mage/repos
