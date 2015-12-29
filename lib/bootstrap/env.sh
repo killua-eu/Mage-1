@@ -58,7 +58,7 @@ env_install() {
   edone "make.conf defaults set" && echo  ""  
   
   einfo "Emerging baseline packages, resyncing the live tree"
-  emerge app-portage/cpuinfo2cpuflags app-portage/flaggie app-portage/eix sys-apps/systemd || eexit "Emerge failed"
+  emerge app-portage/cpuinfo2cpuflags app-portage/flaggie app-portage/eix || eexit "Emerge failed"
   eix-sync || eexit "Failed syncing the portage tree. Connection down?"
   edone "Baseline packages emerged, live tree resynced."
   
