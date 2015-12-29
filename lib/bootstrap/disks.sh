@@ -35,7 +35,7 @@ disks_setup() {
         2)
             disks_info # may not like thumbdrive (error Invalid partition table - recursive partition on /dev/sdb. ignore/cancel?
             efail "Continuing here will permanently delete any data on disks you play with"
-            einfo "Set the disk to install stuff on (usually /dev/sda)" && read "type in the device: " dev1
+            einfo "Set the disk to install stuff on (usually /dev/sda)" && read dev1
             # Partitioning
             disks_parted_def "${dev1}"
             # FS
@@ -246,6 +246,7 @@ disks_remount() {
     einfo " 1) Server setup (2 disks): 2x biosboot + mdraid1.ext4 /boot + mdraid1.ext4 swap + btrfs.raid1 root"
     einfo " 2) General setup (1 disk): 1x biosboot + ext4 /boot + swap + btrfs root"
     einfo " 3) General setup (1 disk): 1x biosboot + ext4 /boot + swap + ext4 root + aufs patch"
+    echo ""
     ewarn "Pick your choice: " && read choice
 
     case "$choice" in
