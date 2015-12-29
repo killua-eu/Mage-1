@@ -125,7 +125,7 @@ btrfs_subvols_def() {
     mkdir -p /mnt/gentoo/{home,root,var,tmp}
     mkdir -p /mnt/gentoo/var/{spool,log}    
     mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=home "${1}" /mnt/gentoo/home || eexit "Failed mounting /mnt/gentoo/home"
-    mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=root "${1}" /mnt/gentoo/home || eexit "Failed mounting /mnt/gentoo/root" 
+    mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=root "${1}" /mnt/gentoo/root || eexit "Failed mounting /mnt/gentoo/root" 
     mount -t btrfs -o defaults,space_cache,nodatacow,noatime,compress=lzo,autodefrag,subvol=tmp "${1}" /mnt/gentoo/tmp || eexit "Failed mounting /mnt/gentoo/tmp"
     mount -t btrfs -o defaults,space_cache,nodatacow,noatime,compress=lzo,autodefrag,subvol=var/log "${1}" /mnt/gentoo/var/log || eexit "Failed mounting /mnt/gentoo/var/log"
     mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=var/spool "${1}" /mnt/gentoo/var/spool || eexit "Failed mounting /mnt/gentoo/var/spool"
