@@ -24,11 +24,13 @@ env_prepare() {
   echo "PORTAGE_ELOG_SYSTEM=\"save\"" >> /mnt/gentoo/etc/portage/make.conf
   echo "FEATURES=\"cgroup parallel-install\"" >> /mnt/gentoo/etc/portage/make.conf
   edone "make.conf defaults set" && echo  ""
+}
 
 # Enter the /mnt/gentoo chroot (this should work after having booted from any linux livecd)
 env_chroot() {
   einfo "Chrooting into /mnt/gentoo"
   ismounted /mnt/gentoo || eexit "/mnt/gentoo unmounted or not a mount point. If you rebooted, you may need to remount partitions (and/or volumes and subvolumes), \`mage env chroot-reenter\` should do that for you. If this is a first installation, either something went really wrong, or you did some steps out of expected order. Either way, you're screwed. You may want to try to ask on github or in gentoo forums tho (beware that mage is not an official thing, so support might be scarse)."
+  #cp -r ~/Mage-master /mnt/gentoo
   cp -L /etc/resolv.conf /mnt/gentoo/etc/
   mount -t proc proc /mnt/gentoo/proc
   mount --rbind /sys /mnt/gentoo/sys
@@ -127,7 +129,7 @@ env_kernel() {
           eexit "Dang! In that case, re-run mage bootstrap env-kernel"
       ;;
   esac
-  
+}  
   
   
 

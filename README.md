@@ -24,6 +24,23 @@ Mage will expect following paths:
 - /var/mage/profiles.all for all available profiles
 - /var/mage/profiles.active for active profiles
 
+**BOOTSTRAPPING**
+
+To bootstrap a new Gentoo box, get yourself a bootable thumbdrive with any live linux distro.
+To flash a thumbdrive with a Gentoo minimal ISO use as root:
+
+~~~
+mkdir gentooiso
+pushd gentooiso
+wget iso.url.iso
+isohybrid *.iso
+dd if=/path/to/image.iso of=/dev/sdc bs=8192k # /dev/sdc assumes your thumbdrive, if its your disk, you will delete your data
+~~~
+
+After booting into the livecd, while being root do 
+wget https://github.com/Vaizard/Mage/archive/master.zip && unzip *.zip && cd M*
+./mage help bootstrap
+
 **WARNING**
 
 Mage is currently designed (by a line of code here andthere) to rely on systemd. The reasons are following:
