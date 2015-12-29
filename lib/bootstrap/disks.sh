@@ -64,6 +64,7 @@ blockfile_exists() {
     done
     [[ ${error_flag} = 1 ]] && eexit "Oops, required blockfiles missing!"
     edone "All good"
+    echo ""
     return 0
 }
 
@@ -107,7 +108,8 @@ btrfs_subvols_def() {
     btrfs subvolume create /mnt/btrfs/root || eexit "Failed creating root subvolume"
     umount /mnt/btrfs
     mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=root "${1}" /mnt/gentoo || eexit "Failed mounting /mnt/gentoo"
-
+    sleep 1
+    
     # /home
     einfo "Creating ${BOLD}/home${NORMAL} subvolume"
     btrfs subvol create /mnt/gentoo/home || eexit "Failed creating home subvolume"
