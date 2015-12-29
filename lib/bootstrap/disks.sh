@@ -11,11 +11,11 @@ disks_info() {
 disks_setup() {
     sdcount=`cat /proc/partitions | awk '{print $4}' | grep sd[a-z] | grep -v [0-9] | wc -l`
     echo ""
-    einfo "We have following options and it seems you have ${sdcount} disks, unless there's a thumdrive installed now:"
+    einfo "We have following options and it seems you have ${sdcount} disks, unless there's a thumbdrive installed now:"
     echo ""
-    einfo " 1) Server setup (2 disks): 2x biosboot + mdraid1.ext4 /boot + mdraid1.ext4 swap + btrfs.raid1 root"
-    einfo " 2) General setup (1 disk): 1x biosboot + ext4 /boot + swap + btrfs root"
-    einfo " 3) General setup (1 disk): 1x biosboot + ext4 /boot + swap + ext4 root + aufs patch"
+    einfo "    1) Server setup (2 disks): 2x biosboot + mdraid1.ext4 /boot + mdraid1.ext4 swap + btrfs.raid1 root"
+    einfo "    2) General setup (1 disk): 1x biosboot + ext4 /boot + swap + btrfs root"
+    einfo "    3) General setup (1 disk): 1x biosboot + ext4 /boot + swap + ext4 root + aufs patch"
     ewarn "Pick your choice: " && read choice
 
     case "$choice" in
@@ -33,9 +33,9 @@ disks_setup() {
             disks_btrfsraid1_swap_mdraid1      "${dev1}3" "${dev2}3"
         ;;
         2)
-            disks_info
+            disks_info # may not like thumbdrive (error Invalid partition table - recursive partition on /dev/sdb. ignore/cancel?
             efail "Continuing here will permanently delete any data on disks you play with"
-            einfo "Set the disk to install stuff on (usually /dev/sda)" && read dev1
+            einfo "Set the disk to install stuff on (usually /dev/sda)" && read "type in the device: " dev1
             # Partitioning
             disks_parted_def "${dev1}"
             # FS
@@ -83,6 +83,8 @@ disks_parted_def() {
     FS=`sgdisk -F ${1}` ; sgdisk -n 3:${FS}:${MAGE_PARTED_DEF_SWAP} -c 3:"swap" -t 3:8200 ${1}     # swap partition
     FS=`sgdisk -F ${1}` ; 
     ES=`sgdisk -E ${1}` ; sgdisk -n 4:${FS}:${ES} -c 4:"root" -t 4:8300 ${1}                       # root partition
+    echo ""
+    edone "Partitioning done, the resulting scheme is below for your pleasure:"
     sgdisk -p ${1}
     # TODO catch return codes of sgdisk and parted
 }
@@ -108,31 +110,31 @@ btrfs_subvols_def() {
 
     # /home
     einfo "Creating ${BOLD}/home${NORMAL} subvolume"
-    mkdir -p /mnt/gentoo/home
     btrfs subvol create /mnt/gentoo/home || eexit "Failed creating home subvolume"
     mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=home "${1}" /mnt/gentoo/home || eexit "Failed mounting /mnt/gentoo/home"
 
     # /tmp
     einfo "Creating ${BOLD}/tmp${NORMAL} subvolume"
-    mkdir -p /mnt/gentoo/tmp
     btrfs subvol create /mnt/gentoo/tmp || eexit "Failed creating tmp subvolume"
     mount -t btrfs -o defaults,space_cache,nodatacow,noatime,compress=lzo,autodefrag,subvol=tmp "${1}" /mnt/gentoo/tmp || eexit "Failed mounting /mnt/gentoo/tmp"
 
+    # Create /var directory so that we can make /var/* subovlumes
+    mkdir -p /mnt/gentoo/var
+    # Create /var/lib directory so that we can make /var/lib* subovlumes
+    mkdir -p /mnt/gentoo/var/lib
+    
     # /var/log
     einfo "Creating ${BOLD}/var/log${NORMAL} subvolume"
-    mkdir -p /mnt/gentoo/var/log
     btrfs subvol create /mnt/gentoo/var/log || eexit "Failed creating varlog subvolume"
     mount -t btrfs -o defaults,space_cache,nodatacow,noatime,compress=lzo,autodefrag,subvol=varlog "${1}" /mnt/gentoo/var/log || eexit "Failed mounting /mnt/gentoo/var/log"
 
     # /var/tmp
     einfo "Creating ${BOLD}/var/tmp${NORMAL} subvolume"
-    mkdir -p /mnt/gentoo/var/tmp
     btrfs subvol create /mnt/gentoo/var/tmp || eexit "Failed creating vartmp subvolume"
     mount -t btrfs -o defaults,space_cache,nodatacow,noatime,compress=lzo,autodefrag,subvol=vartmp "${1}" /mnt/gentoo/var/tmp || eexit "Failed mounting /mnt/gentoo/var/tmp"
 
     # /var/spool
     einfo "Creating ${BOLD}/var/spool${NORMAL} subvolume"
-    mkdir -p /mnt/gentoo/var/spool
     btrfs subvol create /mnt/gentoo/var/spool || eexit "Failed creating varspool subvolume"
     mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=varspool "${1}" /mnt/gentoo/var/spool || eexit "Failed mounting /mnt/gentoo/var/spool"
 
