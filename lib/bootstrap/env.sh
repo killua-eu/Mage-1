@@ -74,10 +74,10 @@ env_install() {
   echo "sys-kernel/dracut" >> /etc/portage/package.accept_keywords/mage-sys-core
   flaggie +systemd +vaapi +vdpau
   # If BOOTSTRAP_MAKECONF* parameters from /etc/mage/bootstrap.conf are set, set make.conf accordingly
-  [[ ! -z ${BOOTSTRAP_MAKECONF_LINGUAS} ]] && echo "LINGUAS="${BOOTSTRAP_MAKECONF_LINGUAS}"" >> /etc/portage/make.conf
-  [[ ! -z ${BOOTSTRAP_MAKECONF_ACCEPT_LICENSE} ]] && echo "ACCEPT_LICENSE="${BOOTSTRAP_MAKECONF_ACCEPT_LICENSE}"" >> /etc/portage/make.conf
-  [[ ! -z ${BOOTSTRAP_MAKECONF_INPUT_DEVICES} ]] && echo "INPUT_DEVICES="${BOOTSTRAP_MAKECONF_INPUT_DEVICES}"" >> /etc/portage/make.conf
-  [[ ! -z ${BOOTSTRAP_MAKECONF_VIDEO_CARDS} ]] && echo "VIDEO_CARDS="${BOOTSTRAP_MAKECONF_VIDEO_CARDS}"" >> /etc/portage/make.conf
+  [[ ! -z ${BOOTSTRAP_MAKECONF_LINGUAS} ]] && echo "LINGUAS=\"${BOOTSTRAP_MAKECONF_LINGUAS}\"" >> /etc/portage/make.conf
+  [[ ! -z ${BOOTSTRAP_MAKECONF_ACCEPT_LICENSE} ]] && echo "ACCEPT_LICENSE=\"${BOOTSTRAP_MAKECONF_ACCEPT_LICENSE}\"" >> /etc/portage/make.conf
+  [[ ! -z ${BOOTSTRAP_MAKECONF_INPUT_DEVICES} ]] && echo "INPUT_DEVICES=\"${BOOTSTRAP_MAKECONF_INPUT_DEVICES}\"" >> /etc/portage/make.conf
+  [[ ! -z ${BOOTSTRAP_MAKECONF_VIDEO_CARDS} ]] && echo "VIDEO_CARDS=\"${BOOTSTRAP_MAKECONF_VIDEO_CARDS}\"" >> /etc/portage/make.conf
   edone "Portage and make.conf configuration now set to good defaults"
 
   einfo "Emerging systemd"
