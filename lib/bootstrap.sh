@@ -39,19 +39,19 @@
 	         chroot-reenter)
 	              env_chroot_reenter
 	         ;;
-	         env-prepare)
+	         prepare)
 	              env_prepare
 	         ;;
-	         env-install)
+	         install)
 	              env_install
 	         ;;
-	         env-kernel)
+	         kernel)
 	              env_kernel
 	         ;;
-	         env-user)
+	         user)
 	              env_user
 	         ;;
-	         env-bootloader)
+	         bootloader)
 	              env_bootloader
 	         ;;
 	    esac

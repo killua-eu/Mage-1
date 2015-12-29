@@ -33,9 +33,9 @@ Got it? Continue or get help with:
    - ${HILITE}mage bootstrap disks setup${NORMAL}
    - ${HILITE}mage bootstrap disks remount${NORMAL}
  * ${HILITE}mage bootstrap env${NORMAL}
-   - ${HILITE}mage bootstrap env chroot${NORMAL}
-   - ${HILITE}mage bootstrap env chroot-reenter${NORMAL}
    - ${HILITE}mage bootstrap env prepare${NORMAL}
+   - ${HILITE}mage bootstrap env chroot${NORMAL}
+   - ${HILITE}(mage bootstrap env chroot-reenter)${NORMAL} use this only if you reboot during the env phases
    - ${HILITE}mage bootstrap env install${NORMAL}
    - ${HILITE}mage bootstrap env kernel${NORMAL}
    - ${HILITE}mage bootstrap env user${NORMAL}
