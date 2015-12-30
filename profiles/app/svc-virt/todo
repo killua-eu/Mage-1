@@ -1,0 +1,47 @@
+# This is the lxd testing GIST
+
+https://github.com/lxc/lxd/blob/master/specs/command-line-user-experience.md
+https://wiki.debian.org/LXC/SimpleBridge
+https://wiki.gentoo.org/wiki/LXD
+https://wiki.gentoo.org/wiki/LXC
+https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/Networking_Guide/sec-Network_Bridging_Using_the_NetworkManager_Command_Line_Tool_nmcli.html
+https://blog.flameeyes.eu/2010/09/linux-containers-and-networking
+http://www.funtoo.org/Linux_Containers
+https://ex0ns.me/2015/09/17/lxc-nat/
+
+## FIRSTRUN
+
+systemctl start lxd 							# start lxd
+lxc remote add images https://images.linuxcontainers.org		# do this once
+echo root:1000000:65536 >>/etc/subuid					# security thing (see gentoo wiki)
+echo root:1000000:65536 >>/etc/subgid 					# security thing (see gentoo wiki)
+
+
+## IMAGES
+
+lxc image list images:							# listing images: (we added those a few lines above)
+lxc image list 								# local
+#usermod --append --groups lxd erik					# TBD later
+
+
+## BRIGDED NETWORK
+
+### brctl way
+./todo.brsetup.sh								
+
+### networkmanager way
+nmcli con add type bridge ifname lxcbr0
+nmcli -f bridge con show bridge-lxcbr0
+
+## PLAY
+
+lxc launch images:centos/7/amd64 centos					# lets download, create and start an image
+lxc start centos							# if you already have it, start it only
+lxc exec centos /bin/bash						# to get into shell do this
+# start network here? /etc/init.d/network start
+
+## STAHP
+
+ifconfig lxcbr0 down
+brctl delbr lxcbr0
+lxc stop centos
