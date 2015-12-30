@@ -9,8 +9,9 @@ or /usr/src/linux/.config (set with <testedconfig>) against predefined
 files. [problems] is an optional switch that displays only problems in
 <testedconfig>. Examples:
 
-mage linuxconfig "/etc/mage/conflinux/*" /proc/config.gz problems
-mage linuxconfig "/etc/mage/conflinux/defaults" /usr/src/linux/.config
+mage linuxconfig /usr/src/linux/.config /etc/mage/profiles-enabled/
+mage linuxconfig /usr/src/linux/.config ./profiles/system/@common/linuxconfig problems
+
 HELP_END
 exit ${1:-1}
 }

@@ -7,7 +7,7 @@ case "$1" in
     enable)
         shift 1;
         pushd "${VARDIR}/${1}" || eexit "No such profile in ${VARDIR}"
-        
+        response="y"
         [[ -f "/etc/mage/profiles-enabled" ]] && [[ `cat /etc/mage/profiles-enabled | grep "${1}"` ]] && ewarn "Profile ${1} already enabled, really wanna do that again?" && read -r -p "[y/n]: " response
         case $response in
              [yY]) 
