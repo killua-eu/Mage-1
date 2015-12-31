@@ -8,6 +8,10 @@ https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/Ne
 https://blog.flameeyes.eu/2010/09/linux-containers-and-networking
 http://www.funtoo.org/Linux_Containers
 https://ex0ns.me/2015/09/17/lxc-nat/
+https://community.flockport.com/topic/25/lxc-net-fails-to-create-bridge-on-ubuntu-server-14-04-1
+https://github.com/fgrehm/vagrant-lxc/wiki/Usage-on-Arch-Linux-hosts
+https://www.flockport.com/flockport-first-look-at-lxd/
+https://linuxcontainers.org/lxc/getting-started/
 
 ## FIRSTRUN
 
