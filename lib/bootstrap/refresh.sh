@@ -20,9 +20,9 @@ refresh() {
 
   pushd ${BINDIR}
   cd ..
-  echo "rm -f master.zip"
+  echo "rm -f ./master.zip"
   wget https://github.com/Vaizard/Mage/archive/master.zip || eexit "Failed to get latest master.zip"
-  echo "rm -rf ${BINDIR}"
+  rm -rf ${BINDIR}
   sleep 5
   rm -rf ${BINDIR}
   unzip master.zip
