@@ -125,7 +125,6 @@ if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
 # ##################
 # ### Run ###
 # ##################
-DIR="/home/vrs/Dev/Mage/lib"
 
 [[ -z ${SCRIPT} ]] && SCRIPT=`readlink -f $0`
 [[ -z ${BINDIR} ]] && BINDIR=`dirname "${SCRIPT}"`

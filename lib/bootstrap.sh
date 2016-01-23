@@ -57,6 +57,12 @@
 	    esac
 	    	
 	;;
+	refresh)
+	    shift 1
+	    . "${LIBDIR}/bootstrap/refresh.sh" || eexit "Can't load ${LIBDIR}/bootstrap/refresh.sh"
+	    refresh
+	;;
+
         *)
     	    eexit "Command ${BOLD}${1}${NORMAL} not recognized, exitting. Try ${BOLD}mage help bootstrap${NORMAL}"
         ;;

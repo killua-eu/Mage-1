@@ -26,6 +26,7 @@ env_chroot() {
   #cp -r ~/Mage-master /mnt/gentoo
   [[ -d "/mnt/gentoo/etc/" ]] || eexit "env prepare stage was probably not called or failed"
   cp -L /etc/resolv.conf /mnt/gentoo/etc/
+  cp /root/Mage-master /mnt/gentoo      # copying
   mount -t proc proc /mnt/gentoo/proc
   mount --rbind /sys /mnt/gentoo/sys
   mount --rbind /dev /mnt/gentoo/dev
