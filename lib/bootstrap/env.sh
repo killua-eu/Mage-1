@@ -49,7 +49,8 @@ env_install() {
   einfo "Syncing portage tree ..."
   emerge-webrsync || ewarn "emerge-webrsync failed (bad connection or server down?)"
   edone "Portage tree synced."
-
+  sleep 5 # TODO REMOVE
+  
   einfo "Updating portage's make.conf defaults"
   echo "MAKEOPTS=\"-j$((`nproc` + 1))\"" >> /etc/portage/make.conf
   echo "PORTAGE_ELOG_CLASSES=\"info log warn error\"" >> /etc/portage/make.conf
@@ -57,6 +58,7 @@ env_install() {
   echo "FEATURES=\"cgroup parallel-install\"" >> /etc/portage/make.conf
   echo "EMERGE_DEFAULT_OPTS=\"--jobs=2\"" >> /etc/portage/make.conf
   edone "make.conf defaults set" && echo  ""  
+  sleep 5 # TODO REMOVE
 
   # Needs be done here, otherwise python utils such as flaggie will fail to run because of UTF
   einfo "Setting the locale"
@@ -65,11 +67,13 @@ env_install() {
   eselect locale set "en_US.utf8" # this will fail if the locale isnt in /etc/locale.gen, test it!
   env-update && source /etc/profile
   edone "Locale set"  
+  sleep 5 # TODO REMOVE
   
   einfo "Emerging baseline packages, resyncing the live tree"
   emerge app-portage/cpuinfo2cpuflags app-portage/flaggie app-portage/eix || eexit "Emerge failed"
   eix-sync || eexit "Failed syncing the portage tree. Connection down?"
   edone "Baseline packages emerged, live tree resynced."
+  sleep 5 # TODO REMOVE
   
   einfo "Finalizing portage and make.conf configuration ..."
   mkdir -p /etc/portage/{package.mask,package.unmask,sets,repos.conf,package.accept_keywords,package.use,env,package}
@@ -82,10 +86,12 @@ env_install() {
   [[ ! -z ${BOOTSTRAP_MAKECONF_INPUT_DEVICES} ]] && echo "INPUT_DEVICES=\"${BOOTSTRAP_MAKECONF_INPUT_DEVICES}\"" >> /etc/portage/make.conf
   [[ ! -z ${BOOTSTRAP_MAKECONF_VIDEO_CARDS} ]] && echo "VIDEO_CARDS=\"${BOOTSTRAP_MAKECONF_VIDEO_CARDS}\"" >> /etc/portage/make.conf
   edone "Portage and make.conf configuration now set to good defaults"
-
+  sleep 5 # TODO REMOVE
+  
   einfo "Emerging systemd"
   emerge -uDN sys-apps/systemd || eexit "Emerge failed"
   edone "systemd emerged"  
+  sleep 5 # TODO REMOVE
   
   einfo "Setting up Mage"
   # Portage repo symlinks
@@ -96,7 +102,7 @@ env_install() {
   # Mount point for `mage tmerge`
   mkdir -p /tmp/portage
   edone "Mage is set up"
- 
+  sleep 5 # TODO REMOVE
   
   einfo "Configuring for systemd ..."
   # TODO toto az po rebootu!!!
@@ -105,6 +111,7 @@ env_install() {
   # required by systemd
   ln -sf /proc/self/mounts /etc/mtab
   edone "Systemd configuration done"
+  sleep 5 # TODO REMOVE
   
   einfo "Enabling bootstrap profiles"
   for PROFILE in ${BOOTSTRAP_PROFILES} ; do
@@ -119,6 +126,7 @@ env_install() {
     [[ ${PROFILE} == *"app/"* ]] && `echo "${SCRIPT} profile enable ${PROFILE}"` || eexit "Enabling profile ${PROFILE} failed"
   done
   edone "All profiles enabled"
+  sleep 5 # TODO REMOVE
 }
 
 # configure kernel, write /etc/fstab, reboot & enjoy
