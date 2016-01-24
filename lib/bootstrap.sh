@@ -13,8 +13,8 @@ firstboot() {
     
     # Detect if we're in a chroot
     if [ "$(stat -c %d:%i /)" != "$(stat -c %d:%i /proc/1/root/.)" ]; then
-        [[ -d "/var/mage" ]] && mkdir -p /var/mage || eexit "Couldn't create /var/mage directory"
-        [[ -f "/var/mage/firstboot" ]] && echo "#!/usr/bin/env bash" > /var/mage/firstboot || eexit "Couldn't write to /var/mage/firstboot file"
+        [[ -d "/var/mage" ]] || mkdir -p /var/mage || eexit "Couldn't create /var/mage directory"
+        [[ -f "/var/mage/firstboot" ]] || echo '#!/usr/bin/env bash' > /var/mage/firstboot || eexit "Couldn't write to /var/mage/firstboot file"
         echo "$@" >> /var/mage/firstboot
     else
         set -x; "$@"; set +x;
