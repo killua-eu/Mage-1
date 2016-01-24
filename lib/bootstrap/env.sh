@@ -195,5 +195,5 @@ LABEL="swap"        none            swap        sw                              
 
 
 env_firstboot() {
-
+ echo "first"
 }
