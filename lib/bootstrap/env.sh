@@ -126,9 +126,9 @@ env_install() {
 env_kernel() {
 
   pushd /usr/src/linux
-  ${SCRIPT} linuxconfig /etc/mage/conflinux/* /usr/src/linux/.config problems
+  ${SCRIPT} linuxconfig /etc/mage/linuxconfig/* /usr/src/linux/.config problems
   make nconfig
-  ${SCRIPT} linuxconfig /etc/mage/conflinux/* /usr/src/linux/.config problems
+  ${SCRIPT} linuxconfig /etc/mage/linuxconfig/* /usr/src/linux/.config problems
     
   read -r -p "Happy now with your config? [y/n]: " response
   case $response in
