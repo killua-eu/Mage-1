@@ -127,17 +127,16 @@ env_kernel() {
 
   pushd /usr/src/linux
   ${SCRIPT} linuxconfig /etc/mage/linuxconfig/* /usr/src/linux/.config problems
+  einfo "Press enter to continue ..."
+  read
   make nconfig
   ${SCRIPT} linuxconfig /etc/mage/linuxconfig/* /usr/src/linux/.config problems
     
   read -r -p "Happy now with your config? [y/n]: " response
   case $response in
       [yY]) 
-          make && make modules_install
-          # TODO test na boot jako mountpoint
-          make install # copy stuff to /boot
-          mkdir -p /boot/efi/boot
-          cp /boot/vmlinuz-* /boot/efi/boot/bootx64.efi
+          ${SCRIPT} mage kernel make
+          ${SCRIPT} mage kernel install   
       ;;
       *)
           eexit "Dang! In that case, re-run mage bootstrap env-kernel"
@@ -149,10 +148,22 @@ env_kernel() {
 
 
 env_user() {
- eexit "mage bootstrap user isn't written yet!"
- #TODO test useradd with nonexisting groupp
- #useradd -m -G users,wheel,video,plugdev,portage,games,usb,lp,lpadmin,scanner -s /bin/bash <user> # not audio due to pulseaudio
- #passwd <user>
+  einfo "Setting up the system user (root) ..."
+  # Figure out which of the following groups exist on the system already
+  grps=( users wheel video plugdev portage games usb lp lpadmin scanner floppy cdrom )
+  grpadd=""
+  [[ -f /etc/group ]]
+  for i in "${grps[@]}"
+  do
+      [[ `cat /etc/group | grep "${i}:"` ]] && grpadd="${grpadd}${i},"
+  done
+  [[ ${grpadd} = "" ]] || grpadd=${grpadd::-1}
+  echo "${grpadd}"
+  ewarn "Please enter the username:"
+  read username
+  useradd -m -G ${grpadd} -s /bin/bash ${username}
+  ewarn "Please enter the password:"  
+  passwd ${username}
 }
 
 
