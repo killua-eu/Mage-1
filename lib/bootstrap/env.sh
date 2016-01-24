@@ -61,6 +61,17 @@ env_install() {
   edone "make.conf defaults set" && echo  ""  
   sleep 5 # TODO REMOVE
 
+  einfo "Setting up Mage"
+  # Portage repo symlinks
+  mkdir -p /var/mage/repos
+  ln -s /usr/portage /var/mage/repos/gentoo
+  ln -s /usr/local/portage /var/mage/repos/local
+  ln -s /var/lib/layman /var/mage/repos/layman
+  # Mount point for `mage tmerge`
+  mkdir -p /tmp/portage
+  edone "Mage is set up"
+  sleep 5 # TODO REMOVE 
+  
   # Needs be done here, otherwise python utils such as flaggie will fail to run because of UTF
   einfo "Setting the locale"
   echo -e "${BOOTSTRAP_LOCALE_GEN}" >> /etc/locale.gen
@@ -68,7 +79,6 @@ env_install() {
   eselect locale set "en_US.utf8" # this will fail if the locale isnt in /etc/locale.gen, test it!
   env-update && source /etc/profile
   edone "Locale set"  
-  sleep 5 # TODO REMOVE
   
   einfo "Emerging baseline packages, resyncing the live tree"
   emerge app-portage/cpuinfo2cpuflags app-portage/flaggie app-portage/eix || eexit "Emerge failed"
@@ -89,31 +99,13 @@ env_install() {
   edone "Portage and make.conf configuration now set to good defaults"
   sleep 5 # TODO REMOVE
   
-  einfo "Emerging systemd"
+  einfo "Setting up systemd"
   emerge -uDN sys-apps/systemd || eexit "Emerge failed"
-  edone "systemd emerged"  
+  firstboot localectl set-locale ${BOOTSTRAP_LOCALE_SET}
+  firstboot timedatectl set-timezone ${BOOTSTRAP_TIMEZONE}
+  edone "Systemd ready"  
   sleep 5 # TODO REMOVE
-  
-  einfo "Setting up Mage"
-  # Portage repo symlinks
-  mkdir -p /var/mage/repos
-  ln -s /usr/portage /var/mage/repos/gentoo
-  ln -s /usr/local/portage /var/mage/repos/local
-  ln -s /var/lib/layman /var/mage/repos/layman
-  # Mount point for `mage tmerge`
-  mkdir -p /tmp/portage
-  edone "Mage is set up"
-  sleep 5 # TODO REMOVE
-  
-  einfo "Configuring for systemd ..."
-  # TODO toto az po rebootu!!!
-  #localectl set-locale ${BOOTSTRAP_LOCALE_SET}
-  #timedatectl set-timezone ${BOOTSTRAP_TIMEZONE}
-  # required by systemd
-  ln -sf /proc/self/mounts /etc/mtab
-  edone "Systemd configuration done"
-  sleep 5 # TODO REMOVE
-  
+ 
   einfo "Enabling bootstrap profiles"
   for PROFILE in ${BOOTSTRAP_PROFILES} ; do
     [[ ${PROFILE} == *"system/"* ]] && `echo "${SCRIPT} profile enable ${PROFILE}"` || eexit "Enabling profile ${PROFILE} failed"
@@ -199,4 +191,9 @@ LABEL="swap"        none            swap        sw                              
 /dev/sda2   /            ext4    defaults,noatime,nodiratime,discard     0 1
 /dev/sda4   /boot	 ext4    defaults,noatime,nodiratime,discard	 0 2
 " >> /etc/fstab
+}
+
+
+env_firstboot() {
+
 }

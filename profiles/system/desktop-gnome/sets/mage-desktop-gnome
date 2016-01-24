@@ -50,5 +50,5 @@ www-plugins/adobe-flash
 
 # Tools
 x11-terms/sakura
-gnome-etra/gnome-boxes
+gnome-extra/gnome-boxes
 app-emulation/virt-manager
