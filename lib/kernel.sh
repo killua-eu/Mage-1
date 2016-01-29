@@ -28,6 +28,7 @@ kernel_install() {
     make install || eexit "Running make install failed, exitting."
     mkdir -p /boot/efi/boot || eexit "Couldn't create /boot/efi/boot"
     cp /boot/vmlinuz-$version /boot/efi/boot/bootx64.efi || eexit "Couldn't copy kernel, exitting." 
+    grub2-mkconfig -o /boot/grub/grub.cfg || eexit "grub2-mkconfig failed"
 }
 
 #
