@@ -226,6 +226,13 @@ disks_btrfsraid1_mountall() {
     mount ${bootpart} /mnt/gentoo/boot  || eexit "Failed mounting /mnt/gentoo/boot"
 }
 
+
+
+disks_btrfsraid1_finish() {
+# TODO this function is currently in the env.sh file for testing, where it doesnt actually belong.
+}
+
+
 disks_remount() {
     # Used to remount partitions after powerdown/freeze
     ewarn "Remounting partitions should be only required if an unexpected reboot during the installation occured."

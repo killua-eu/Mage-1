@@ -90,6 +90,8 @@ env_install() {
   mkdir -p /etc/portage/{package.mask,package.unmask,sets,repos.conf,package.accept_keywords,package.use,env,package}
   cpuinfo2cpuflags-x86 >> /etc/portage/make.conf
   echo "sys-kernel/dracut" >> /etc/portage/package.accept_keywords/mage-sys-core
+  echo "sys-kernel/dracut device-mapper btrfs ssh-client systemd" >>  >> /etc/portage/package.use/mage-sys-core 
+
   flaggie +systemd +vaapi +vdpau
   # If BOOTSTRAP_MAKECONF* parameters from /etc/mage/bootstrap.conf are set, set make.conf accordingly
   [[ ! -z ${BOOTSTRAP_MAKECONF_LINGUAS} ]] && echo "LINGUAS=\"${BOOTSTRAP_MAKECONF_LINGUAS}\"" >> /etc/portage/make.conf
@@ -167,8 +169,31 @@ env_user() {
 }
 
 
+disks_btrfsraid1_finish() {
+echo "GRUB_CMDLINE_LINUX=\"rootfstype=btrfs real_init=/usr/lib/systemd/systemd\" rootflags=device=/dev/${1}4,subvol=root\"" >> /etc/default/grub
+echo 'filesystems+="btrfs ext2 ext4"' >> /etc/dracut.conf # http://nlug.ml1.co.uk/2013/08/gentoo-dracut-btrfs-quirk/4293
+ismounted /boot || eexit  "boot not mounted"
+dracut --hostonly 
+grub2-install "/dev/${1}"
+#grub2-install "/dev/${2}" # applies only on raid1 setup
+grub2-mkconfig -o /boot/grub/grub.cfg
+echo "
+# <fs>              <mountpoint>    <type>      <opts>                                                                         <dump/pass>
+LABEL="boot"        /boot           ext2        noauto,noatime                                                                 1 2
+LABEL="@"           /               brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@                  0 0
+LABEL="root"        /root           brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=root               0 0
+LABEL="home"        /home           brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=home               0 0
+LABEL="tmp"         /tmp            brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=tmp                0 0
+LABEL="varlog"      /var/log        brtfs       defaults,space_cache,noatime,nodatacow,compress=lzo,autodefrag,subvol=varlog   0 0
+LABEL="vartmp"      /var/tmp        brtfs       defaults,space_cache,noatime,nodatacow,compress=lzo,autodefrag,subvol=vartmp   0 0
+LABEL="varspool"    /var/spool      brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=varspool           0 0
+LABEL="swap"        none            swap        sw                                                                             0 0
+" >> /etc/fstab
+}
+
+
 env_bootloader() {
- eexit "mage bootstrap bootloader isn't written yet!"
+ disks_btrfsraid1_finish sda
 }
   
 # configure kernel, write /etc/fstab, reboot & enjoy
