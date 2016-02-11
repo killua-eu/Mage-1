@@ -230,6 +230,7 @@ disks_btrfsraid1_mountall() {
 
 disks_btrfsraid1_finish() {
 # TODO this function is currently in the env.sh file for testing, where it doesnt actually belong.
+echo "fuu"
 }
 
 
