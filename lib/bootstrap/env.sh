@@ -90,7 +90,7 @@ env_install() {
   mkdir -p /etc/portage/{package.mask,package.unmask,sets,repos.conf,package.accept_keywords,package.use,env,package}
   cpuinfo2cpuflags-x86 >> /etc/portage/make.conf
   echo "sys-kernel/dracut" >> /etc/portage/package.accept_keywords/mage-sys-core
-  echo "sys-kernel/dracut device-mapper btrfs ssh-client systemd" >>  >> /etc/portage/package.use/mage-sys-core 
+  echo "sys-kernel/dracut device-mapper btrfs ssh-client systemd" >> /etc/portage/package.use/mage-sys-core 
 
   flaggie +systemd +vaapi +vdpau
   # If BOOTSTRAP_MAKECONF* parameters from /etc/mage/bootstrap.conf are set, set make.conf accordingly
