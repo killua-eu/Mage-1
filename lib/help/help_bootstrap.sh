@@ -40,6 +40,7 @@ Got it? Continue or get help with:
    - ${HILITE}mage bootstrap env kernel${NORMAL}
    - ${HILITE}mage bootstrap env user${NORMAL}
    - ${HILITE}mage bootstrap env bootloader${NORMAL}
+ * ${HILITE}mage bootstrap refresh${NORMAL} <-- here be dragons, for developers only
  
 HELP_END
 exit ${1:-1}

@@ -110,19 +110,19 @@ env_install() {
  
   einfo "Enabling bootstrap profiles"
   for PROFILE in ${BOOTSTRAP_PROFILES} ; do
-    [ ${PROFILE} == *"system/"* ] ; then
+    if [ ${PROFILE} == *"system/"* ] ; then
       `echo "${SCRIPT} profile enable ${PROFILE}"` || eexit "Enabling profile ${PROFILE} failed"
     fi
     # TODO counter to see how many system profiles have been enabled
   done
   for PROFILE in ${BOOTSTRAP_PROFILES} ; do
-    [ ${PROFILE} == *"hardware/"* ] ; then
+    if [ ${PROFILE} == *"hardware/"* ] ; then
       `echo "${SCRIPT} profile enable ${PROFILE}"` || eexit "Enabling profile ${PROFILE} failed"
     fi
     # TODO counter to see how many hardware profiles have been enabled
   done
   for PROFILE in ${BOOTSTRAP_PROFILES} ; do
-    [ ${PROFILE} == *"app/"* ] ; then 
+    if [ ${PROFILE} == *"app/"* ] ; then 
       `echo "${SCRIPT} profile enable ${PROFILE}"` || eexit "Enabling profile ${PROFILE} failed"
     fi
   done

@@ -24,7 +24,7 @@ kernel_make() {
 kernel_install() {
     einfo "Installing the (`readlink /usr/src/linux`) kernel into /boot"
     [[ -d "/boot" ]] || ewarn "/boot doesnt exist"
-    ![ ${1} == "--mount-test-disabled" ] ; then
+    if ![ ${1} == "--mount-test-disabled" ] ; then
       mount | grep boot || mount /boot || eexit "Failed to mount /boot"
     fi
     make install || eexit "Running make install failed, exitting."
