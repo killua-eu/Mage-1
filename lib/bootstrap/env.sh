@@ -144,7 +144,7 @@ env_kernel() {
   case $response in
       [yY]) 
           ${SCRIPT} kernel make
-          ${SCRIPT} kernel install   
+          ${SCRIPT} kernel install nomountcheck
       ;;
       *)
           eexit "Dang! In that case, re-run mage bootstrap env-kernel"

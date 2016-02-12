@@ -24,11 +24,12 @@ kernel_make() {
 kernel_install() {
     einfo "Installing the (`readlink /usr/src/linux`) kernel into /boot"
     [[ -d "/boot" ]] || ewarn "/boot doesnt exist"
-    if ![ ${1} == "--mount-test-disabled" ] ; then
+    if [ "${1}" = "nomountcheck" ] ; then
       mount | grep boot || mount /boot || eexit "Failed to mount /boot"
     fi
     make install || eexit "Running make install failed, exitting."
     mkdir -p /boot/efi/boot || eexit "Couldn't create /boot/efi/boot"
+    mkdir -p /boot/grub || eexit "Couldn't create /boot/grub"
     cp /boot/vmlinuz-$version /boot/efi/boot/bootx64.efi || eexit "Couldn't copy kernel, exitting." 
     grub2-mkconfig -o /boot/grub/grub.cfg || eexit "grub2-mkconfig failed"
 }
@@ -48,7 +49,8 @@ do
 
         install)
             shift 1;
-	    kernel_install;
+	    kernel_install "${1}";
+	    shift 1;
         ;;
         *)
     	    eexit "Command ${BOLD}${1}${NORMAL} not recognized, exitting. Try ${BOLD}make${NORMAL} or ${BOLD}install${NORMAL}"
