@@ -110,15 +110,21 @@ env_install() {
  
   einfo "Enabling bootstrap profiles"
   for PROFILE in ${BOOTSTRAP_PROFILES} ; do
-    [[ ${PROFILE} == *"system/"* ]] && `echo "${SCRIPT} profile enable ${PROFILE}"` || eexit "Enabling profile ${PROFILE} failed"
+    [ ${PROFILE} == *"system/"* ] ; then
+      `echo "${SCRIPT} profile enable ${PROFILE}"` || eexit "Enabling profile ${PROFILE} failed"
+    fi
     # TODO counter to see how many system profiles have been enabled
   done
   for PROFILE in ${BOOTSTRAP_PROFILES} ; do
-    [[ ${PROFILE} == *"hardware/"* ]] && `echo "${SCRIPT} profile enable ${PROFILE}"` || eexit "Enabling profile ${PROFILE} failed"
+    [ ${PROFILE} == *"hardware/"* ] ; then
+      `echo "${SCRIPT} profile enable ${PROFILE}"` || eexit "Enabling profile ${PROFILE} failed"
+    fi
     # TODO counter to see how many hardware profiles have been enabled
   done
   for PROFILE in ${BOOTSTRAP_PROFILES} ; do
-    [[ ${PROFILE} == *"app/"* ]] && `echo "${SCRIPT} profile enable ${PROFILE}"` || eexit "Enabling profile ${PROFILE} failed"
+    [ ${PROFILE} == *"app/"* ] ; then 
+      `echo "${SCRIPT} profile enable ${PROFILE}"` || eexit "Enabling profile ${PROFILE} failed"
+    fi
   done
   edone "All profiles enabled"
   sleep 5 # TODO REMOVE
@@ -128,17 +134,17 @@ env_install() {
 env_kernel() {
 
   pushd /usr/src/linux
-  ${SCRIPT} linuxconfig /etc/mage/linuxconfig/* /usr/src/linux/.config problems
+  ${SCRIPT} linuxconfig /usr/src/linux/.config /etc/mage/linuxconfig/* problems
   einfo "Press enter to continue ..."
   read
   make nconfig
-  ${SCRIPT} linuxconfig /etc/mage/linuxconfig/* /usr/src/linux/.config problems
+  ${SCRIPT} linuxconfig /usr/src/linux/.config /etc/mage/linuxconfig/* problems
     
   read -r -p "Happy now with your config? [y/n]: " response
   case $response in
       [yY]) 
-          ${SCRIPT} mage kernel make
-          ${SCRIPT} mage kernel install   
+          ${SCRIPT} kernel make
+          ${SCRIPT} kernel install   
       ;;
       *)
           eexit "Dang! In that case, re-run mage bootstrap env-kernel"

@@ -24,7 +24,9 @@ kernel_make() {
 kernel_install() {
     einfo "Installing the (`readlink /usr/src/linux`) kernel into /boot"
     [[ -d "/boot" ]] || ewarn "/boot doesnt exist"
-    mount | grep boot || mount /boot || eexit "Failed to mount /boot"
+    ![ ${1} == "--mount-test-disabled" ] ; then
+      mount | grep boot || mount /boot || eexit "Failed to mount /boot"
+    fi
     make install || eexit "Running make install failed, exitting."
     mkdir -p /boot/efi/boot || eexit "Couldn't create /boot/efi/boot"
     cp /boot/vmlinuz-$version /boot/efi/boot/bootx64.efi || eexit "Couldn't copy kernel, exitting." 
