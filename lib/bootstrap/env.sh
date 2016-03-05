@@ -169,16 +169,19 @@ env_user() {
   echo "${grpadd}"
   ewarn "Please enter the username:"
   read username
-  useradd -m -G ${grpadd} -s /bin/bash ${username}
+  useradd -m -G ${grpadd} -s /bin/bash ${username} ## TODO HOMEDIRECTORY chybi <--------------------------------
   ewarn "Please enter the password:"  
   passwd ${username}
+  ewarn "Enter root password:"
+  passwd
 }
 
 
 disks_btrfsraid1_finish() {
-echo "GRUB_CMDLINE_LINUX=\"rootfstype=btrfs real_init=/usr/lib/systemd/systemd\" rootflags=device=/dev/${1}4,subvol=root\"" >> /etc/default/grub
+# real_init= is used with initramfs, init= without initramfs
+echo "GRUB_CMDLINE_LINUX=\"rootfstype=btrfs real_init=/usr/lib/systemd/systemd init=/usr/lib/systemd/systemd\" rootflags=device=/dev/${1}4,subvol=root\"" >> /etc/default/grub
 echo 'filesystems+="btrfs ext2 ext4"' >> /etc/dracut.conf # http://nlug.ml1.co.uk/2013/08/gentoo-dracut-btrfs-quirk/4293
-ismounted /boot || eexit  "boot not mounted"
+#ismounted /boot || eexit  "boot not mounted" 
 dracut --hostonly 
 grub2-install "/dev/${1}"
 #grub2-install "/dev/${2}" # applies only on raid1 setup
@@ -237,5 +240,8 @@ LABEL="swap"        none            swap        sw                              
 
 
 env_firstboot() {
- echo "first"
+ einfo "Finalizing ..."
+ chmod +x /var/mage/firstboot
+ /var/mage/firstboot # todo bin/bash na zacatek souboru
+ # TODO dodelat totot
 }
