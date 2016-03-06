@@ -110,19 +110,19 @@ env_install() {
  
   einfo "Enabling bootstrap profiles"
   for PROFILE in ${BOOTSTRAP_PROFILES} ; do
-    if [ ${PROFILE} == *"system/"* ] ; then
+  if [ `echo "${PROFILE}" | grep "system/"` ] ; then
       `echo "${SCRIPT} profile enable ${PROFILE}"` || eexit "Enabling profile ${PROFILE} failed"
     fi
     # TODO counter to see how many system profiles have been enabled
   done
   for PROFILE in ${BOOTSTRAP_PROFILES} ; do
-    if [ ${PROFILE} == *"hardware/"* ] ; then
+  if [ `echo "${PROFILE}" | grep "hardware/"` ] ; then
       `echo "${SCRIPT} profile enable ${PROFILE}"` || eexit "Enabling profile ${PROFILE} failed"
     fi
     # TODO counter to see how many hardware profiles have been enabled
   done
   for PROFILE in ${BOOTSTRAP_PROFILES} ; do
-    if [ ${PROFILE} == *"app/"* ] ; then 
+  if [ `echo "${PROFILE}" | grep "app/"` ] ; then
       `echo "${SCRIPT} profile enable ${PROFILE}"` || eexit "Enabling profile ${PROFILE} failed"
     fi
   done
@@ -169,7 +169,7 @@ env_user() {
   echo "${grpadd}"
   ewarn "Please enter the username:"
   read username
-  useradd -m -G ${grpadd} -s /bin/bash ${username} ## TODO HOMEDIRECTORY chybi <--------------------------------
+  useradd -m -G ${grpadd} -s /bin/bash ${username} 
   ewarn "Please enter the password:"  
   passwd ${username}
   ewarn "Enter root password:"
