@@ -1,1 +1,2 @@
-=sys-kernel/gentoo-sources-4.4.3 +~amd64
+=sys-kernel/gentoo-sources-4.4.4 +~amd64
+sys-kernel/dracut +~amd64
