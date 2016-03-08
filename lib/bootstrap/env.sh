@@ -40,9 +40,9 @@ env_chroot() {
 
 # In case that env_install gets interrupted (i.e. power failure, frozen ILO, random reboot, accidental meteorite showers etc.)
 env_chroot_reenter() {
-  mage bootstrap net test
-  mage bootstrap disks remount
-  mage bootstrap env chroot
+  echo `${SCRIPT} bootstrap net test`
+  echo `mage bootstrap disks remount`
+  echo `mage bootstrap env chroot`
 }
 
 # Configure the environment and install userspace
