@@ -114,8 +114,8 @@ btrfs_subvols_def() {
     btrfs subvolume create home || eexit "Failed creating home subvolume"
     btrfs subvolume create tmp  || eexit "Failed creating tmp subvolume"
     mkdir -p var/lib
-    btrfs subvolume create var/log || eexit "Failed creating var/log subvolume"
-    btrfs subvolume create var/spool || eexit "Failed creating var/spool subvolume"
+    btrfs subvolume create varlog || eexit "Failed creating var/log subvolume"
+    btrfs subvolume create varspool || eexit "Failed creating var/spool subvolume"
 
     # Unmount again and remount with options
     popd
@@ -127,9 +127,9 @@ btrfs_subvols_def() {
     mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=home "${1}" /mnt/gentoo/home || eexit "Failed mounting /mnt/gentoo/home"
     mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=root "${1}" /mnt/gentoo/root || eexit "Failed mounting /mnt/gentoo/root" 
     mount -t btrfs -o defaults,space_cache,nodatacow,noatime,compress=lzo,autodefrag,subvol=tmp "${1}" /mnt/gentoo/tmp || eexit "Failed mounting /mnt/gentoo/tmp"
-    mount -t btrfs -o defaults,space_cache,nodatacow,noatime,compress=lzo,autodefrag,subvol=var/log "${1}" /mnt/gentoo/var/log || eexit "Failed mounting /mnt/gentoo/var/log"
-    mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=var/spool "${1}" /mnt/gentoo/var/spool || eexit "Failed mounting /mnt/gentoo/var/spool"
-
+    mount -t btrfs -o defaults,space_cache,nodatacow,noatime,compress=lzo,autodefrag,subvol=varlog "${1}" /mnt/gentoo/var/log || eexit "Failed mounting /mnt/gentoo/var/log"
+    mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=varspool "${1}" /mnt/gentoo/var/spool || eexit "Failed mounting /mnt/gentoo/var/spool"
+    
     # Copy-on-write comes with some advantages, but can negatively affect performance with large files that have 
     # small random writes because it will fragment them (even if no "copy" is ever performed!). It is recommended
     # to disable copy-on-write for database files and virtual machine images. 
@@ -213,16 +213,17 @@ disks_btrfsraid1_mountall() {
     rootpart=${1} # i.e. /dev/sda4
     bootpart=${2} # i.e. /dev/md0 or /dev/md126 (in case of mdraid1) or /dev/sda2 (in case of single disk)
     mkdir -p /mnt/gentoo
-    mkdir -p /mnt/gentoo/{home,boot,tmp,var}
-    mkdir -p /mnt/gentoo/var/{spool,tmp,log}
-
-    mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=root ${1} /mnt/gentoo || eexit "Failed mounting /mnt/gentoo"
+    #mkdir -p /mnt/gentoo/{home,boot,tmp,var}
+    #mkdir -p /mnt/gentoo/var/{spool,tmp,log}
+    
+    mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@ "${1}" /mnt/gentoo || eexit "Failed mounting /mnt/gentoo"
+    sleep 1
     mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=home "${1}" /mnt/gentoo/home || eexit "Failed mounting /mnt/gentoo/home"
+    mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=root "${1}" /mnt/gentoo/root || eexit "Failed mounting /mnt/gentoo/root" 
     mount -t btrfs -o defaults,space_cache,nodatacow,noatime,compress=lzo,autodefrag,subvol=tmp "${1}" /mnt/gentoo/tmp || eexit "Failed mounting /mnt/gentoo/tmp"
     mount -t btrfs -o defaults,space_cache,nodatacow,noatime,compress=lzo,autodefrag,subvol=varlog "${1}" /mnt/gentoo/var/log || eexit "Failed mounting /mnt/gentoo/var/log"
-    mount -t btrfs -o defaults,space_cache,nodatacow,noatime,compress=lzo,autodefrag,subvol=vartmp "${1}" /mnt/gentoo/var/tmp || eexit "Failed mounting /mnt/gentoo/var/tmp"
     mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=varspool "${1}" /mnt/gentoo/var/spool || eexit "Failed mounting /mnt/gentoo/var/spool"
-
+    
     mount ${bootpart} /mnt/gentoo/boot  || eexit "Failed mounting /mnt/gentoo/boot"
 }
 

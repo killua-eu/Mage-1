@@ -179,7 +179,7 @@ env_user() {
 
 disks_btrfsraid1_finish() {
 # real_init= is used with initramfs, init= without initramfs
-echo "GRUB_CMDLINE_LINUX=\"rootfstype=btrfs real_init=/usr/lib/systemd/systemd init=/usr/lib/systemd/systemd\" rootflags=device=/dev/${1}4,subvol=root\"" >> /etc/default/grub
+echo "GRUB_CMDLINE_LINUX=\"rootfstype=btrfs real_init=/usr/lib/systemd/systemd init=/usr/lib/systemd/systemd rootflags=device=/dev/${1}4,subvol=@\"" >> /etc/default/grub
 echo 'filesystems+="btrfs ext2 ext4"' >> /etc/dracut.conf # http://nlug.ml1.co.uk/2013/08/gentoo-dracut-btrfs-quirk/4293
 #ismounted /boot || eexit  "boot not mounted" 
 dracut --hostonly 
@@ -194,7 +194,6 @@ LABEL="root"        /root           brtfs       defaults,space_cache,noatime,com
 LABEL="home"        /home           brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=home               0 0
 LABEL="tmp"         /tmp            brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=tmp                0 0
 LABEL="varlog"      /var/log        brtfs       defaults,space_cache,noatime,nodatacow,compress=lzo,autodefrag,subvol=varlog   0 0
-LABEL="vartmp"      /var/tmp        brtfs       defaults,space_cache,noatime,nodatacow,compress=lzo,autodefrag,subvol=vartmp   0 0
 LABEL="varspool"    /var/spool      brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=varspool           0 0
 LABEL="swap"        none            swap        sw                                                                             0 0
 " >> /etc/fstab
@@ -226,7 +225,7 @@ grub2-mkconfig -o /boot/grub/grub.cfg
   echo "
 # <fs>              <mountpoint>    <type>      <opts>                                              <dump/pass>
 LABEL="boot"        /boot           ext2        noauto,noatime                                          1 2
-LABEL="root"        /               brtfs       defaults,noatime,compress=lzo,autodefrag,subvol=root    0 0
+LABEL="root"        /               brtfs       defaults,noatime,compress=lzo,autodefrag,subvol=@       0 0
 LABEL="root"        /home           brtfs       defaults,noatime,compress=lzo,autodefrag,subvol=home    0 0
 LABEL="swap"        none            swap        sw                                                      0 0
 " >> /etc/fstab
