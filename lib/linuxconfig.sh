@@ -30,6 +30,7 @@ zgrep -h . ${REQUIREMENTS} | while read LINE; do
        [[ -n "${CONFV}" ]] && echo "${BAD}${CONFP}=${CONFV}${NORMAL}   [expected value: ${VALUE}]"
        if ! [ "${VALUE}" = "n" ]; then {
          [[ -n "${CONFV}" ]] || echo "${WARN}${PARAM}=${VALUE}${NORMAL}   [option not set at all]"
+       }
        fi
      fi
     echo Hello | grep -iq hello; 
