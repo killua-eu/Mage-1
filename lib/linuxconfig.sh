@@ -13,6 +13,8 @@
 
 # zgrep, unlike zcat, works on both, compressed and auncompressed files.
 # zgrep also doesn't signal eof such as zless or zmore.
+# {PARAM,VALUE} shall be from the requirements set
+# {CONFP,CONFV} shall be from the kernel .config set
 zgrep -h . ${REQUIREMENTS} | while read LINE; do 
   PARAM=`printf "$LINE" | grep ^[^#] | sed 's:#.*$::g' | awk -F'=' '{print $1}'`
   VALUE=`printf "$LINE" | grep ^[^#] | sed 's:#.*$::g' | awk -F'=' '{print $2}' |  sed 's/^[ \t]*//;s/[ \t]*$//'`
@@ -26,7 +28,7 @@ zgrep -h . ${REQUIREMENTS} | while read LINE; do
        [[ "${!#}" = "problems" ]] || echo "${GOOD}${CONFP}=${CONFV}" # ${!#} is the "last parameter" equivalent, replaces ${3}
      else
        [[ -n "${CONFV}" ]] && echo "${BAD}${CONFP}=${CONFV}${NORMAL}   [expected value: ${VALUE}]"
-       [[ -n "${CONFV}" ]] || echo "${WARN}${PARAM}=${VALUE}${NORMAL}   [option not set at all]"
+       [[ "${VALUE}"="n" ]] && [[ -n "${CONFV}" ]] || echo "${WARN}${PARAM}=${VALUE}${NORMAL}   [option not set at all]"
      fi
     echo Hello | grep -iq hello; 
   fi
