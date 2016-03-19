@@ -28,7 +28,10 @@ zgrep -h . ${REQUIREMENTS} | while read LINE; do
        [[ "${!#}" = "problems" ]] || echo "${GOOD}${CONFP}=${CONFV}" # ${!#} is the "last parameter" equivalent, replaces ${3}
      else
        [[ -n "${CONFV}" ]] && echo "${BAD}${CONFP}=${CONFV}${NORMAL}   [expected value: ${VALUE}]"
-       [[ "${VALUE}"="n" ]] || [[ -n "${CONFV}" ]] || echo "${WARN}${PARAM}=${VALUE}${NORMAL}   [option not set at all]"
+       if [ ! "${VALUE}"="n" ]; then {
+         [[ -n "${CONFV}" ]] || echo "${WARN}${PARAM}=${VALUE}${NORMAL}   [option not set at all]"
+       }
+       fi
      fi
     echo Hello | grep -iq hello; 
   fi
