@@ -27,11 +27,13 @@ zgrep -h . ${REQUIREMENTS} | while read LINE; do
      if echo "${CONFV}" | grep -iq "${VALUE}"; then # Case insensitive comparison. `if [ "${CONFV}" =~ "${VALUE}" ]; then` didn't work for whatever reason.
        [[ "${!#}" = "problems" ]] || echo "${GOOD}${CONFP}=${CONFV}" # ${!#} is the "last parameter" equivalent, replaces ${3}
      else
+       shopt -s nocasematch
        [[ -n "${CONFV}" ]] && echo "${BAD}${CONFP}=${CONFV}${NORMAL}   [expected value: ${VALUE}]"
        if ! [ "${VALUE}" = "n" ]; then {
          [[ -n "${CONFV}" ]] || echo "${WARN}${PARAM}=${VALUE}${NORMAL}   [option not set at all]"
        }
        fi
+       shopt -u nocasematch
      fi
     echo Hello | grep -iq hello; 
   fi
