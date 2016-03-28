@@ -132,7 +132,7 @@ env_install() {
 
 # configure kernel, write /etc/fstab, reboot & enjoy
 env_kernel() {
-
+  # https://bpaste.net/raw/506ec064e8ef kernel
   pushd /usr/src/linux
   ${SCRIPT} linuxconfig /usr/src/linux/.config /etc/mage/linuxconfig/* problems
   einfo "Press enter to continue ..."
@@ -176,13 +176,39 @@ env_user() {
   passwd
 }
 
+env_bootloader() {
+    # Flush the page cache to ensure GRUB2 sees the latest disk content
+    echo 1 > /proc/sys/vm/drop_caches
+    . "${LIBDIR}/bootstrap/disks.sh" || eexit "Can't load ${LIBDIR}/bootstrap/disks.sh"
+    einfo "Available devices:"
+    echo ""
+    ls -l /dev | grep -E ' (sd|hd|md)..?$'
+    echo ""
+    ewarn "Now a teaser, you gotta remember what disk layout you installed (probably the default marked with *):"
+    select_file "${LIBDIR}/bootstrap/disks" ${BOOTSTRAP_PART_SCHEME} "choice"
+    . "${LIBDIR}/bootstrap/disks/${choice}" || eexit "Can't load ${LIBDIR}/bootstrap/disks/${choice}"
+
+   cat  > /etc/dracut.conf.d/local.conf << EOF
+hostonly="yes"
+add_dracutmodules+="bash btrfs systemd systemd-initrd dracut-systemd usrmount rescue base"
+compress="xz"
+EOF  
+
+   dracut --hostonly --force '' $(readlink -f /usr/src/linux | sed -e 's!.*linux-!!')   
+    
+    # GRUB_PARAMS should set here everything userspace related
+    # everything partition/disk scheme related is appended by the disks_bootloader function
+    GRUB_PARAMS="real_init=/usr/lib/systemd/systemd init=/usr/lib/systemd/systemd" 
+    disks_bootloader "${GRUB_PARAMS}"
+}
 
 disks_btrfsraid1_finish() {
 # real_init= is used with initramfs, init= without initramfs
 echo "GRUB_CMDLINE_LINUX=\"rootfstype=btrfs real_init=/usr/lib/systemd/systemd init=/usr/lib/systemd/systemd rootflags=device=/dev/${1}4,subvol=@\"" >> /etc/default/grub
-echo 'filesystems+="btrfs ext2 ext4"' >> /etc/dracut.conf # http://nlug.ml1.co.uk/2013/08/gentoo-dracut-btrfs-quirk/4293
+echo 'filesystems+="btrfs ext2 ext4"' >> /etc/dracut.conf # http://nlug.ml1.co.uk/2013/08/gentoo-dracut-btrfs-quirk/4293  # TODO NAHRADIT /etc/dracut.conf.d
 #ismounted /boot || eexit  "boot not mounted" 
 dracut --hostonly 
+
 grub2-install "/dev/${1}"
 #grub2-install "/dev/${2}" # applies only on raid1 setup
 grub2-mkconfig -o /boot/grub/grub.cfg
@@ -201,7 +227,15 @@ LABEL="swap"        none            swap        sw                              
 
 
 env_bootloader() {
- disks_btrfsraid1_finish sda
+mkdir -p /etc/dracut.conf.d
+echo ' 
+filesystems+="btrfs ext2 ext4"
+#hostonly="yes"
+add_dracutmodules+="btrfs systemd systemd-initrd busybox dracut-systemd kernel-modules base dm dmraid biosdevname fs-lib uefi-lib bash"' >> /etc/dracut.conf.d/mage.conf
+dracut -f '' $(readlink -f /usr/src/linux | sed -e 's!.*linux-!!') 
+. "${LIBDIR}/bootstrap/disks/single.extboot+btrfsroot.sh" || eexit "Can't load ${LIBDIR}/bootstrap/disks/single.extboot+btrfsroot.sh"
+disks_bootloader()
+# todo ulozit a nacist device
 }
   
 # configure kernel, write /etc/fstab, reboot & enjoy

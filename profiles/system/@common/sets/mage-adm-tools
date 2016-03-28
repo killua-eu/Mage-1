@@ -1,6 +1,6 @@
-app-arch/p7zip
-app-arch/unace
-app-arch/arj
+#app-arch/p7zip
+#app-arch/unace
+#app-arch/arj
 app-arch/cpio
 app-arch/dpkg
 app-cdr/cdrtools
@@ -9,11 +9,11 @@ app-arch/lha
 app-arch/lzop
 app-arch/unrar
 app-arch/rpm
-app-arch/zoo
+#app-arch/zoo
 app-misc/colordiff
 app-misc/mc
 app-misc/unfoo
 app-shells/gentoo-bashcomp
-dev-libs/libisoburn
+#dev-libs/libisoburn
 app-text/wgetpaste
 sys-process/lsof
