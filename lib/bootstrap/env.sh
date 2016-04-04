@@ -199,7 +199,7 @@ EOF
     # GRUB_PARAMS should set here everything userspace related
     # everything partition/disk scheme related is appended by the disks_bootloader function
     GRUB_PARAMS="real_init=/usr/lib/systemd/systemd init=/usr/lib/systemd/systemd" 
-    disks_bootloader "${GRUB_PARAMS}"
+    disks_do_bootloader "${GRUB_PARAMS}"
 }
 
 disks_btrfsraid1_finish() {

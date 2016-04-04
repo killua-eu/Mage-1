@@ -88,7 +88,7 @@ disks_setup() {
     
     select_file "${LIBDIR}/bootstrap/disks" ${BOOTSTRAP_PART_SCHEME} "choice"
     . "${LIBDIR}/bootstrap/disks/${choice}" || eexit "Can't load ${LIBDIR}/bootstrap/disks/${choice}"
-    disks_setup()
+    disks_do_setup()
 }
 
 
@@ -103,7 +103,7 @@ disks_remount() {
     ewarn "Now a teaser, you gotta remember what disk layout you installed (probably the default marked with *):"
     select_file "${LIBDIR}/bootstrap/disks" ${BOOTSTRAP_PART_SCHEME} "choice"
     . "${LIBDIR}/bootstrap/disks/${choice}" || eexit "Can't load ${LIBDIR}/bootstrap/disks/${choice}"
-    disks_remount()
+    disks_do_remount()
 }
 
 

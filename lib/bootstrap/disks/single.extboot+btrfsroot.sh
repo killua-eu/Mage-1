@@ -88,7 +88,7 @@ disks_mount() {
 # ### public functions
 ######################    
 
-disks_setup() {    
+disks_do_setup() {    
 
     einfo "Set the disk to install stuff on (usually /dev/sda)" && read dev1
     disks_makepart "${dev1}"
@@ -97,7 +97,7 @@ disks_setup() {
 
 }    
 
-disks_remount() {    
+disks_do_remount() {    
 
     einfo "Set the disk to install stuff on (usually /dev/sda)" && read dev1
     disks_makepart "${dev1}"
@@ -106,7 +106,7 @@ disks_remount() {
 
 }  
 
-disks_bootloader() { # used by bootstrap/env to install the bootloader
+disks_do_bootloader() { # used by bootstrap/env to install the bootloader
 
 einfo "Set the disk to install stuff on (usually /dev/sda)" && read dev1
 # GRUB_CMDLINE_LINUX should only append stuff relevnt to disk partitioning and fstype
