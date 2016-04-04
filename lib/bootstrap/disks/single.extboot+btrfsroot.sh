@@ -25,13 +25,14 @@ disks_makepart() {
     echo ""
     edone "Partitioning done, the resulting scheme is below for your pleasure:"
     sgdisk -p ${1}
+    sync
     # TODO catch return codes of sgdisk and parted
 
 }
 
 disks_makefs() {
     
-    sleep 1
+    sleep 2
     echo ""
     einfo "Setting up the filesystems"
     echo ""
@@ -65,14 +66,14 @@ disks_makefs() {
  
 disks_mount() {
 
-    sleep 1
+    sleep 2
     echo ""
     einfo "Mounting all partitions and subvolumes ..."
     echo ""
 
     mkdir -p /mnt/gentoo
     mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@ "${1}4" /mnt/gentoo || eexit "Failed mounting /mnt/gentoo"
-    sleep 1
+    sleep 2
     mkdir -p /mnt/gentoo/{home,root,var,tmp,boot}
     mkdir -p /mnt/gentoo/var/{spool,log}    
     mount "${1}2" /mnt/gentoo/boot || eexit "Failed mounting /mnt/gentoo/boot"
