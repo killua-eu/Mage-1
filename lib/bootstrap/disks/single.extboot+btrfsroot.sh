@@ -41,9 +41,9 @@ disks_makefs() {
     blockfile_exists "${1}3"
     blockfile_exists "${1}4"
     ### Create filesystems
-    mkfs.btrfs -f -L "root" "${1}4" || eexit "mkfs.btrfs (root) failed"
+    mkfs.btrfs -f -L "btrfs" "${1}4" || eexit "mkfs.btrfs (root) failed"
     mkfs.ext4 -L "boot" "${1}2" || eexit "mkfs.ext4 (boot) failed"
-    mkswap "${1}3" || eexit "mkswap failed"
+    mkswap -L "swap" "${1}3" || eexit "mkswap failed"
     swapon "${1}3" || eexit "swapon failed"
     ### Create the subvolumes on the "${1}4" device
     # Temporarly mount the btrfs volume to /mnt/btrfs
