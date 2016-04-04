@@ -25,14 +25,13 @@ disks_makepart() {
     echo ""
     edone "Partitioning done, the resulting scheme is below for your pleasure:"
     sgdisk -p ${1}
-    sync
     # TODO catch return codes of sgdisk and parted
 
 }
 
 disks_makefs() {
     
-    sleep 2
+    sleep 1
     echo ""
     einfo "Setting up the filesystems"
     echo ""
@@ -50,13 +49,14 @@ disks_makefs() {
     # Temporarly mount the btrfs volume to /mnt/btrfs
     mkdir -p /mnt/btrfs
     mount -t btrfs -o defaults,noatime,compress=lzo,autodefrag "${1}4" /mnt/btrfs || eexit "Failed mounting /mnt/btrfs"
+    sleep 1
     pushd /mnt/btrfs >> /dev/null
     # Create subvolumes
     btrfs subvolume create @           || eexit "Failed creating @ subvolume"
     btrfs subvolume create @/root      || eexit "Failed creating @/root subvolume"
     btrfs subvolume create @/home      || eexit "Failed creating @/home subvolume"
     btrfs subvolume create @/tmp       || eexit "Failed creating @/tmp subvolume"
-    mkdir -p var/lib
+    mkdir -p ./var/lib || eexit "Failed to create ./var/lib directories"
     btrfs subvolume create @/var/log   || eexit "Failed creating @/var/log subvolume"
     btrfs subvolume create @/var/spool || eexit "Failed creating @/var/spool subvolume"
     # Unmount again and remount with options
@@ -66,14 +66,14 @@ disks_makefs() {
  
 disks_mount() {
 
-    sleep 2
+    sleep 1
     echo ""
     einfo "Mounting all partitions and subvolumes ..."
     echo ""
 
     mkdir -p /mnt/gentoo
     mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@ "${1}4" /mnt/gentoo || eexit "Failed mounting /mnt/gentoo"
-    sleep 2
+    sleep 1
     mkdir -p /mnt/gentoo/{home,root,var,tmp,boot}
     mkdir -p /mnt/gentoo/var/{spool,log}    
     mount "${1}2" /mnt/gentoo/boot || eexit "Failed mounting /mnt/gentoo/boot"
