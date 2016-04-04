@@ -50,12 +50,12 @@ disks_makefs() {
     mkdir -p /mnt/btrfs
     mount -t btrfs -o defaults,noatime,compress=lzo,autodefrag "${1}4" /mnt/btrfs || eexit "Failed mounting /mnt/btrfs"
     pushd /mnt/btrfs >> /dev/null
-    mkdir -p var/lib
     # Create subvolumes
     btrfs subvolume create @           || eexit "Failed creating @ subvolume"
     btrfs subvolume create @/root      || eexit "Failed creating @/root subvolume"
     btrfs subvolume create @/home      || eexit "Failed creating @/home subvolume"
     btrfs subvolume create @/tmp       || eexit "Failed creating @/tmp subvolume"
+    mkdir -p var/lib
     btrfs subvolume create @/var/log   || eexit "Failed creating @/var/log subvolume"
     btrfs subvolume create @/var/spool || eexit "Failed creating @/var/spool subvolume"
     # Unmount again and remount with options
