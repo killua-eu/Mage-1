@@ -52,14 +52,15 @@ disks_makefs() {
     sleep 1
     pushd /mnt/btrfs >> /dev/null
     # Create subvolumes
-    btrfs subvolume create @           || eexit "Failed creating @ subvolume"
-    btrfs subvolume create @/root      || eexit "Failed creating @/root subvolume"
-    btrfs subvolume create @/home      || eexit "Failed creating @/home subvolume"
-    btrfs subvolume create @/tmp       || eexit "Failed creating @/tmp subvolume"
-    mkdir -p ./var/lib || eexit "Failed to create ./var/lib directories"
-    btrfs subvolume create @/var/log   || eexit "Failed creating @/var/log subvolume"
-    btrfs subvolume create @/var/spool || eexit "Failed creating @/var/spool subvolume"
-    # Unmount again and remount with options
+    btrfs subvolume create @         || eexit "Failed creating @ subvolume"
+    btrfs subvolume create @/tmp     || eexit "Failed creating @/tmp subvolume"
+    btrfs subvolume create @/var     || eexit "Failed creating @/var subvolume"
+    btrfs subvolume create @/var/log || eexit "Failed creating @/var/log subvolume"
+    btrfs subvolume create @/root    || eexit "Failed creating @/root subvolume"
+    btrfs subvolume create @/home    || eexit "Failed creating @/home subvolume"
+    btrfs subvolume create GENTOO    || eexit "Failed creating GENTOO subvolume"
+     
+   # Unmount again and remount with options
     popd
     umount /mnt/btrfs    
 }    
@@ -75,16 +76,18 @@ disks_mount() {
     mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@ "${1}4" /mnt/gentoo || eexit "Failed mounting /mnt/gentoo"
     sleep 1
     mkdir -p /mnt/gentoo/{home,root,var,tmp,boot}
-    mkdir -p /mnt/gentoo/var/{spool,log}    
     mount "${1}2" /mnt/gentoo/boot || eexit "Failed mounting /mnt/gentoo/boot"
-    mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@/home "${1}4" /mnt/gentoo/home || eexit "Failed mounting /mnt/gentoo/home"
-    mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@/root "${1}4" /mnt/gentoo/root || eexit "Failed mounting /mnt/gentoo/root" 
     mount -t btrfs -o defaults,space_cache,nodatacow,noatime,compress=lzo,autodefrag,subvol=@/tmp "${1}4" /mnt/gentoo/tmp || eexit "Failed mounting /mnt/gentoo/tmp"
+    mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@/var  "${1}4" /mnt/gentoo/var  || eexit "Failed mounting /mnt/gentoo/var" 
+    mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@/root "${1}4" /mnt/gentoo/root || eexit "Failed mounting /mnt/gentoo/root" 
+    mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@/home "${1}4" /mnt/gentoo/home || eexit "Failed mounting /mnt/gentoo/home"
+    mkdir -p /mnt/gentoo/var/log
+    mkdir -p /mnt/gentoo/usr/portage
     mount -t btrfs -o defaults,space_cache,nodatacow,noatime,compress=lzo,autodefrag,subvol=@/var/log "${1}4" /mnt/gentoo/var/log || eexit "Failed mounting /mnt/gentoo/var/log"
-    mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@/var/spool "${1}4" /mnt/gentoo/var/spool || eexit "Failed mounting /mnt/gentoo/var/spool"   
+    mount -t btrfs -o defaults,space_cache,nodatacow,noatime,compress=lzo,autodefrag,subvol=GENTOO "${1}4" /mnt/gentoo/var/log || eexit "Failed mounting /mnt/gentoo//mnt/gentoo/usr/portage"
     edone "All partitions and subvolumes mounted."
 }   
-
+#nodev,nosuid,noexec
 ######################
 # ### public functions
 ######################    
@@ -123,13 +126,20 @@ echo "
 # <fs>              <mountpoint>    <type>      <opts>                                                                         <dump/pass>
 LABEL="boot"        /boot           ext4        noauto,noatime                                                                  1 2
 LABEL="btrfs"       /               brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@                   0 0
+LABEL="btrfs"       /tmp            brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,nodatacow,subvol=@/tmp     0 0
+LABEL="btrfs"       /var            brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@/var               0 0
 LABEL="btrfs"       /root           brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@/root              0 0
 LABEL="btrfs"       /home           brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@/home              0 0
-LABEL="btrfs"       /tmp            brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@/tmp               0 0
-LABEL="btrfs"       /var/log        brtfs       defaults,space_cache,noatime,nodatacow,compress=lzo,autodefrag,subvol=@/var/log 0 0
-LABEL="btrfs"       /var/spool      brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@/var/spool         0 0
+
+LABEL="btrfs"       /var/log        brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,nodatacow,subvol=@/var/log 0 0
+LABEL="btrfs"       /usr/portage    brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,nodatacow,subvol=GENTOO    0 0
 LABEL="swap"        none            swap        sw                                                                              0 0
 " >> /etc/fstab
+
+    mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@ "${1}4" /mnt/gentoo || eexit "Failed mounting /mnt/gentoo"
+    sleep 1
+    mkdir -p /mnt/gentoo/{home,root,var,tmp,boot}
+    mount "${1}2" /mnt/gentoo/boot || eexit "Failed mounting /mnt/gentoo/boot"
 
 }
    
