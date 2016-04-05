@@ -58,7 +58,7 @@ disks_makefs() {
     btrfs subvolume create @/var/log || eexit "Failed creating @/var/log subvolume"
     btrfs subvolume create @/root    || eexit "Failed creating @/root subvolume"
     btrfs subvolume create @/home    || eexit "Failed creating @/home subvolume"
-    btrfs subvolume create GENTOO    || eexit "Failed creating GENTOO subvolume"
+    btrfs subvolume create PORTAGE   || eexit "Failed creating PORTAGE subvolume"
      
    # Unmount again and remount with options
     popd
@@ -84,7 +84,7 @@ disks_mount() {
     mkdir -p /mnt/gentoo/var/log
     mkdir -p /mnt/gentoo/usr/portage
     mount -t btrfs -o defaults,space_cache,nodatacow,noatime,compress=lzo,autodefrag,subvol=@/var/log "${1}4" /mnt/gentoo/var/log || eexit "Failed mounting /mnt/gentoo/var/log"
-    mount -t btrfs -o defaults,space_cache,nodatacow,noatime,compress=lzo,autodefrag,subvol=GENTOO "${1}4" /mnt/gentoo/var/log || eexit "Failed mounting /mnt/gentoo//mnt/gentoo/usr/portage"
+    mount -t btrfs -o defaults,space_cache,nodatacow,noatime,compress=lzo,autodefrag,subvol=PORTAGE "${1}4" /mnt/gentoo/usr/portage || eexit "Failed mounting mnt/gentoo/usr/portage"
     edone "All partitions and subvolumes mounted."
 }   
 #nodev,nosuid,noexec
@@ -132,7 +132,7 @@ LABEL="btrfs"       /root           brtfs       defaults,space_cache,noatime,com
 LABEL="btrfs"       /home           brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@/home              0 0
 
 LABEL="btrfs"       /var/log        brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,nodatacow,subvol=@/var/log 0 0
-LABEL="btrfs"       /usr/portage    brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,nodatacow,subvol=GENTOO    0 0
+LABEL="btrfs"       /usr/portage    brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,nodatacow,subvol=PORTAGE   0 0
 LABEL="swap"        none            swap        sw                                                                              0 0
 " >> /etc/fstab
 
