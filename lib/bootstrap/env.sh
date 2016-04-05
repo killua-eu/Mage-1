@@ -234,7 +234,7 @@ filesystems+="btrfs ext2 ext4"
 add_dracutmodules+="btrfs systemd systemd-initrd busybox dracut-systemd kernel-modules base dm dmraid biosdevname fs-lib uefi-lib bash"' >> /etc/dracut.conf.d/mage.conf
 dracut -f '' $(readlink -f /usr/src/linux | sed -e 's!.*linux-!!') 
 . "${LIBDIR}/bootstrap/disks/single.extboot+btrfsroot.sh" || eexit "Can't load ${LIBDIR}/bootstrap/disks/single.extboot+btrfsroot.sh"
-disks_bootloader()
+disks_bootloader
 # todo ulozit a nacist device
 }
   
