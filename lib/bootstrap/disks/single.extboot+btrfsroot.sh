@@ -104,8 +104,6 @@ disks_do_setup() {
 disks_do_remount() {    
 
     einfo "Set the disk to install stuff on (usually /dev/sda)" && read dev1
-    disks_makepart "${dev1}"
-    disks_makefs "${dev1}"
     disks_mount "${dev1}"
 
 }  
