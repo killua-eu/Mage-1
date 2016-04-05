@@ -188,11 +188,11 @@ env_bootloader() {
     select_file "${LIBDIR}/bootstrap/disks" ${BOOTSTRAP_PART_SCHEME} "choice"
     . "${LIBDIR}/bootstrap/disks/${choice}" || eexit "Can't load ${LIBDIR}/bootstrap/disks/${choice}"
 
-   cat  > /etc/dracut.conf.d/local.conf <<EOF
+cat  > /etc/dracut.conf.d/local.conf << ENDER
 hostonly="yes"
 add_dracutmodules+="bash btrfs systemd systemd-initrd dracut-systemd usrmount rescue base"
 compress="xz"
-EOF  
+ENDER
 
    dracut --hostonly --force '' $(readlink -f /usr/src/linux | sed -e 's!.*linux-!!')   
     
