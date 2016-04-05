@@ -112,7 +112,7 @@ disks_do_remount() {
 
 disks_do_bootloader() { # used by bootstrap/env to install the bootloader
 
-einfo "Set the disk to install stuff on (usually /dev/sda)" && read dev1
+einfo "Set the disk to install stuff on (usually /dev/*sda*)" && read dev1
 # GRUB_CMDLINE_LINUX should only append stuff relevnt to disk partitioning and fstype
 # it will be appended via ${1} from the bootstrap/env script with userspace settings (i.e. init=)
 echo "GRUB_CMDLINE_LINUX=\"rootfstype=btrfs rootflags=device=/dev/${dev1}4,subvol=@ dobtrfs ${1}\"" >> /etc/default/grub
@@ -136,10 +136,6 @@ LABEL="btrfs"       /usr/portage    brtfs       defaults,space_cache,noatime,com
 LABEL="swap"        none            swap        sw                                                                              0 0
 " >> /etc/fstab
 
-    mount -t btrfs -o defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@ "${1}4" /mnt/gentoo || eexit "Failed mounting /mnt/gentoo"
-    sleep 1
-    mkdir -p /mnt/gentoo/{home,root,var,tmp,boot}
-    mount "${1}2" /mnt/gentoo/boot || eexit "Failed mounting /mnt/gentoo/boot"
 
 }
    
