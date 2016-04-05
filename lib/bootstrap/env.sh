@@ -226,17 +226,17 @@ LABEL="swap"        none            swap        sw                              
 }
 
 
-env_bootloader() {
-mkdir -p /etc/dracut.conf.d
-echo ' 
-filesystems+="btrfs ext2 ext4"
-#hostonly="yes"
-add_dracutmodules+="btrfs systemd systemd-initrd busybox dracut-systemd kernel-modules base dm dmraid biosdevname fs-lib uefi-lib bash"' >> /etc/dracut.conf.d/mage.conf
-dracut -f '' $(readlink -f /usr/src/linux | sed -e 's!.*linux-!!') 
-. "${LIBDIR}/bootstrap/disks/single.extboot+btrfsroot.sh" || eexit "Can't load ${LIBDIR}/bootstrap/disks/single.extboot+btrfsroot.sh"
-disks_bootloader
-# todo ulozit a nacist device
-}
+#env_bootloader() {
+#mkdir -p /etc/dracut.conf.d
+#echo ' 
+#filesystems+="btrfs ext2 ext4"
+##hostonly="yes"
+#add_dracutmodules+="btrfs systemd systemd-initrd busybox dracut-systemd kernel-modules base dm dmraid biosdevname fs-lib uefi-lib bash"' >> /etc/dracut.conf.d/mage.conf
+#dracut -f '' $(readlink -f /usr/src/linux | sed -e 's!.*linux-!!') 
+#. "${LIBDIR}/bootstrap/disks/single.extboot+btrfsroot.sh" || eexit "Can't load ${LIBDIR}/bootstrap/disks/single.extboot+btrfsroot.sh"
+#disks_bootloader
+## todo ulozit a nacist device
+#}
   
 # configure kernel, write /etc/fstab, reboot & enjoy
 env_bootloader_unfinished() {

@@ -29,7 +29,7 @@ zgrep -h . ${REQUIREMENTS} | while read LINE; do
      else
        shopt -s nocasematch
        [[ -n "${CONFV}" ]] && echo "${BAD}${CONFP}=${CONFV}${NORMAL}   [expected value: ${VALUE}]"
-       if ! [ "${VALUE}" = "n" ]; then {
+       if ! [ "${VALUE}" = "n" ]; then { # TODO nocasematch doesnt work here for whatever reasons, replace with nN
          [[ -n "${CONFV}" ]] || echo "${WARN}${PARAM}=${VALUE}${NORMAL}   [option not set at all]"
        }
        fi
