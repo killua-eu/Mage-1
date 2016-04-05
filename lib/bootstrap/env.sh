@@ -192,6 +192,7 @@ cat  > /etc/dracut.conf.d/local.conf << ENDER
 hostonly="yes"
 add_dracutmodules+="bash btrfs systemd systemd-initrd dracut-systemd usrmount rescue base"
 compress="xz"
+filesystems+="btrfs ext2 ext4"
 ENDER
 
    dracut --hostonly --force '' $(readlink -f /usr/src/linux | sed -e 's!.*linux-!!')   
@@ -200,29 +201,6 @@ ENDER
     # everything partition/disk scheme related is appended by the disks_bootloader function
     GRUB_PARAMS="real_init=/usr/lib/systemd/systemd init=/usr/lib/systemd/systemd" 
     disks_do_bootloader "${GRUB_PARAMS}"
-}
-
-disks_btrfsraid1_finish() {
-# real_init= is used with initramfs, init= without initramfs
-echo "GRUB_CMDLINE_LINUX=\"rootfstype=btrfs real_init=/usr/lib/systemd/systemd init=/usr/lib/systemd/systemd rootflags=device=/dev/${1}4,subvol=@\"" >> /etc/default/grub
-echo 'filesystems+="btrfs ext2 ext4"' >> /etc/dracut.conf # http://nlug.ml1.co.uk/2013/08/gentoo-dracut-btrfs-quirk/4293  # TODO NAHRADIT /etc/dracut.conf.d
-#ismounted /boot || eexit  "boot not mounted" 
-dracut --hostonly 
-
-grub2-install "/dev/${1}"
-#grub2-install "/dev/${2}" # applies only on raid1 setup
-grub2-mkconfig -o /boot/grub/grub.cfg
-echo "
-# <fs>              <mountpoint>    <type>      <opts>                                                                         <dump/pass>
-LABEL="boot"        /boot           ext2        noauto,noatime                                                                 1 2
-LABEL="@"           /               brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@                  0 0
-LABEL="root"        /root           brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=root               0 0
-LABEL="home"        /home           brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=home               0 0
-LABEL="tmp"         /tmp            brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=tmp                0 0
-LABEL="varlog"      /var/log        brtfs       defaults,space_cache,noatime,nodatacow,compress=lzo,autodefrag,subvol=varlog   0 0
-LABEL="varspool"    /var/spool      brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=varspool           0 0
-LABEL="swap"        none            swap        sw                                                                             0 0
-" >> /etc/fstab
 }
 
 
@@ -238,39 +216,6 @@ LABEL="swap"        none            swap        sw                              
 ## todo ulozit a nacist device
 #}
   
-# configure kernel, write /etc/fstab, reboot & enjoy
-env_bootloader_unfinished() {
-
-# gnome na extu
-echo 'GRUB_CMDLINE_LINUX="rootfstype=ext4 real_init=/usr/lib/systemd/systemd"' >> /etc/default/grub
-grub2-install /dev/sda
-grub2-mkconfig -o /boot/grub/grub.cfg
-
-# btrfs na 2 discich s dracutem
-  dracut --hostonly 
-  grub2-install /dev/sda
-  grub2-install /dev/sdb
-  grub2-mkconfig -o /boot/grub/grub.cfg
-  # errors
-  #  /run/lvm/lvmetad.socket: connect failed: No such file or directory
-  # WARNING: Failed to connect to lvmetad. Falling back to internal scanning.
-  # No volume groups found
-  # can be ignored
-  echo "
-# <fs>              <mountpoint>    <type>      <opts>                                              <dump/pass>
-LABEL="boot"        /boot           ext2        noauto,noatime                                          1 2
-LABEL="root"        /               brtfs       defaults,noatime,compress=lzo,autodefrag,subvol=@       0 0
-LABEL="root"        /home           brtfs       defaults,noatime,compress=lzo,autodefrag,subvol=home    0 0
-LABEL="swap"        none            swap        sw                                                      0 0
-" >> /etc/fstab
-
-  echo "
-/dev/sda3   none         swap    sw                                      0 0
-/dev/sda2   /            ext4    defaults,noatime,nodiratime,discard     0 1
-/dev/sda4   /boot	 ext4    defaults,noatime,nodiratime,discard	 0 2
-" >> /etc/fstab
-}
-
 
 env_firstboot() {
  einfo "Finalizing ..."

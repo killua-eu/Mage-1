@@ -116,7 +116,6 @@ einfo "Set the disk to install stuff on (usually /dev/*sda*)" && read dev1
 # GRUB_CMDLINE_LINUX should only append stuff relevnt to disk partitioning and fstype
 # it will be appended via ${1} from the bootstrap/env script with userspace settings (i.e. init=)
 echo "GRUB_CMDLINE_LINUX=\"rootfstype=btrfs rootflags=device=/dev/${dev1}4,subvol=@ dobtrfs ${1}\"" >> /etc/default/grub
-echo 'filesystems+="btrfs ext2 ext4"' >> /etc/dracut.conf # http://nlug.ml1.co.uk/2013/08/gentoo-dracut-btrfs-quirk/4293  # TODO NAHRADIT /etc/dracut.conf.d
 
 
 grub2-install "/dev/${dev1}"
