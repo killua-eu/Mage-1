@@ -26,6 +26,11 @@ echo "${1}"
 		    help_banner
 		    help_linuxconfig
 		;;
+		listdrivers)
+		    . "${LIBDIR}/help/help_listdrivers.sh" || eexit "Can't load ${LIBDIR}/help/help_listdrivers.sh"
+		    help_banner
+		    help_listdrivers
+		;;
 		overlay)
 		    . "${LIBDIR}/help/help_overlay.sh" || eexit "Can't load ${LIBDIR}/help/help_overlay.sh"
 		    help_banner

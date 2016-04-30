@@ -122,14 +122,14 @@ grub2-mkconfig -o /boot/grub/grub.cfg
 echo "
 # <fs>              <mountpoint>    <type>      <opts>                                                                         <dump/pass>
 LABEL="boot"        /boot           ext4        noauto,noatime                                                                  1 2
-LABEL="btrfs"       /               brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@                   0 0
-LABEL="btrfs"       /tmp            brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,nodatacow,subvol=@/tmp     0 0
-LABEL="btrfs"       /var            brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@/var               0 0
-LABEL="btrfs"       /root           brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@/root              0 0
-LABEL="btrfs"       /home           brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@/home              0 0
+LABEL="btrfs"       /               btrfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@                   0 0
+LABEL="btrfs"       /tmp            btrfs       defaults,space_cache,noatime,compress=lzo,autodefrag,nodatacow,subvol=@/tmp     0 0
+LABEL="btrfs"       /var            btrfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@/var               0 0
+LABEL="btrfs"       /root           btrfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@/root              0 0
+LABEL="btrfs"       /home           btrfs       defaults,space_cache,noatime,compress=lzo,autodefrag,subvol=@/home              0 0
 
-LABEL="btrfs"       /var/log        brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,nodatacow,subvol=@/var/log 0 0
-LABEL="btrfs"       /usr/portage    brtfs       defaults,space_cache,noatime,compress=lzo,autodefrag,nodatacow,subvol=PORTAGE   0 0
+LABEL="btrfs"       /var/log        btrfs       defaults,space_cache,noatime,compress=lzo,autodefrag,nodatacow,subvol=@/var/log 0 0
+LABEL="btrfs"       /usr/portage    btrfs       defaults,space_cache,noatime,compress=lzo,autodefrag,nodatacow,subvol=PORTAGE   0 0
 LABEL="swap"        none            swap        sw                                                                              0 0
 " >> /etc/fstab
 

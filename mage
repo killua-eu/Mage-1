@@ -146,6 +146,9 @@ case "$1" in
     linuxconfig)
 	shift 1 ; . "${LIBDIR}/linuxconfig.sh" || eexit "Can't load ${LIBDIR}/linuxconfig.sh"
     ;;
+    listdrivers)
+	shift 1 ; . "${LIBDIR}/listdrivers.sh" || eexit "Can't load ${LIBDIR}/listdrivers.sh"
+    ;;
     overlay)
 	shift 1 ; . "${LIBDIR}/overlay.sh" || eexit "Can't load ${LIBDIR}/overlay.sh"
     ;;
